@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "confluence-server.fullname" . }}
+  labels:
+    {{- include "confluence-server.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  {{- with .Values.updateStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "confluence-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "confluence-server.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- . | toYaml | trim | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if .Values.caCerts }}
+      initContainers:
+        - name: ca-certs
+          image: adoptopenjdk/openjdk11:alpine
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - cp -f \"${JAVA_HOME}/lib/security/cacerts\" /var/atlassian/application-data/confluence/cacerts;
+              for f in /var/atlassian/application-data/confluence/secrets/cas/*;
+              do keytool -importcert -file \"${f}\" -alias \"$(basename \"${f}\")\" -keystore /var/atlassian/application-data/confluence/cacerts -storepass {{ .Values.caCerts.storepass | quote }} -trustcacerts -noprompt;
+              done;
+          volumeMounts:
+            - mountPath: /var/atlassian/application-data/confluence
+              name: {{ include "confluence-server.pvcHome" . }}
+            - mountPath: /var/atlassian/application-data/confluence/secrets/cas
+              name: confluence-cas
+          {{- with .Values.caCertsEnv }}
+          env:
+            {{- . | toYaml | trim | nindent 12 }}
+          {{- end }}
+      {{- end }}
+    {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName | quote }}
+      {{- end }}
+      serviceAccountName: {{ include "confluence-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "confluence-server.fullname" . }}-cm
+          ports:
+            - name: http
+              containerPort: 8090
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: http
+            {{- range $key, $val := .Values.readinessProbe }}
+            {{ $key }}: {{ $val }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: http
+            {{- range $key, $val := .Values.livenessProbe }}
+            {{ $key }}: {{ $val }}
+            {{- end }}
+          volumeMounts:
+            - mountPath: /var/atlassian/application-data/confluence
+              name: {{ include "confluence-server.pvcHome" . }}
+            {{- if .Values.mountAttachments.enabled }}
+            - mountPath: /var/atlassian/application-data/confluence/attachments
+              name: {{ include "confluence-server.pvcAttachments" . }}
+            {{- end }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "confluence-server.tplValue" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: {{ include "confluence-server.pvcHome" . }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "confluence-server.pvcHome" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.mountAttachments.enabled }}
+        - name: {{ include "confluence-server.pvcAttachments" . }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.mountAttachments.existingClaim | default (include "confluence-server.pvcAttachments" .) }}
+        {{- end }}
+        {{- if .Values.caCerts }}
+        - name: confluence-cas
+          secret:
+            secretName: {{ .Values.caCerts.secret }}
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "confluence-server.tplValue" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

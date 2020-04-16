@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- if .Values.vaultSecrets.enabled }}
+  annotations:
+    vault.secrets: {{ .Values.vaultSecrets.secret | quote }}
+  {{- end }}
+  name: {{ include "confluence-server.fullname" . }}-cm
+  labels:
+    {{- include "confluence-server.labels" . | nindent 4 }}
+data:
+  {{- range $key, $val := .Values.envVars }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  ATL_JDBC_URL: "jdbc:{{ .Values.databaseConnection.type }}://{{ .Values.databaseConnection.host }}:{{ .Values.databaseConnection.port }}/{{ .Values.databaseConnection.database }}"
+  ATL_JDBC_USER: "{{ .Values.databaseConnection.user }}"
+  ATL_JDBC_PASSWORD: {{ .Values.databaseConnection.password | quote }}
+  ATL_DB_TYPE: "{{ .Values.databaseConnection.type }}"
+  {{- if .Values.extraEnv.enabled }}
+  JVM_SUPPORT_RECOMMENDED_ARGS: |-
+    {{- range $key, $val := .Values.extraEnv.parameters }}
+    {{ $key }}={{ $val }}
+    {{- end }}
+  {{- end }}

@@ -1,0 +1,44 @@
+apiVersion: v2
+name: confluence-server
+description: Wiki collaboration platform
+
+# Application charts are a collection of templates that can be packaged into versioned archives
+# to be deployed.
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+version: 0.1.1
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+appVersion: 7.3.3
+
+icon: https://www.atlassian.com/dam/jcr:1b7f4009-27d0-4882-8629-cecae97fc00f/Confluence-blue.svg
+
+dependencies:
+  - name: postgresql
+    version: 10
+    repository:  https://kubernetes-charts.storage.googleapis.com
+    condition: postgresql.enabled
+    tags:
+      - postgres
+
+keywords:
+- wiki
+- confluence
+- confluence-server
+- atlassian
+- documentation
+- application
+
+home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+
+sources:
+- https://helm.sh
+- https://helm.mox.sh
+- https://hub.docker.com/r/atlassian/confluence-server
+
+maintainers:
+- name: jmox
+  email: jmox@protonmail.com

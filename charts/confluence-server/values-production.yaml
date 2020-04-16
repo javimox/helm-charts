@@ -1,0 +1,359 @@
+# Default values for wiki.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# @Notes
+# We must set resources requests and limits for preventing OOM killer
+
+## Atlassian Confluence image version
+## ref: https://hub.docker.com/r/atlassian/confluence-server
+image:
+  # registry: hub.docker.com
+  repository: atlassian/confluence-server
+  tag: 7.3.3
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  pullSecrets: {}
+  #   - myRegistryKeySecretName
+
+## String to partially override wiki.fullname template (will maintain the release name)
+nameOverride: ""
+
+## String to fully override wiki.fullname template
+fullnameOverride: ""
+
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#podsecuritycontext-v1-core
+podSecurityContext:
+  fsGroup: 2002
+
+## Security context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Service/Networking
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+## Kubernetes svc configuration
+service:
+  ## For minikube, set this to NodePort, elsewhere use LoadBalancer
+  type: NodePort
+  ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
+  ##
+  ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
+  ## HTTP Port, must be the same as ATL_TOMCAT_PORT (default: 8090)
+  port: 8090
+  ## HTTPS Port, in case ATL_TOMCAT_SCHEME is set to 'https'
+  httpsPort:
+  loadBalancerIP:
+  ## Use nodePorts to requets some specific ports when usin NodePort
+  ## nodePorts:
+  ##   http: <to set explicitly, choose port between 30000-32767>
+  ##   https: <to set explicitly, choose port between 30000-32767>
+  ##
+  nodePorts:
+    http: ""
+    https: ""
+  ## Enable client source IP preservation
+  ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+
+## Configure the ingress resource that allows you to access the
+## Confluence installation. Set up the URL
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+ingress:
+  ## Set to true to enable ingress record generation
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: confluence-server.local
+      paths: []
+  tls: []
+  #  - secretName: confluence-server.local-tls
+  #    hosts:
+  #      - confluence-server.local
+
+## Resources. Mandatory, see @Notes above.
+## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests:
+    memory: 2Gi
+    cpu: 500m
+#  limits:
+#    memory: 2Gi
+
+## Replication (without ReplicaSet)
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+replicaCount: 1
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+## Pod annotations
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+
+## Persistent Volume Claim
+## Confluence Home directory
+## https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+persistence:
+  enabled: true
+  annotations: {}
+  ## existingClaim needs the existing PVC name
+  existingClaim: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to nil, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass:
+
+## Persistent Volume CLaim
+## Confluence Attachments directory
+mountAttachments:
+  enabled: true
+  ## existingClaim needs the existing PVC name
+  existingClaim: ""
+  accessMode: ReadWriteOnce
+  size: 50Gi
+
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to nil, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass:
+
+# Additional volume mounts
+extraVolumeMounts: []
+  ## Example: Mount CA file
+  # - name: ca-cert
+  #   subPath: ca_cert
+  #   mountPath: /path/to/ca_cert
+
+# Additional volumes
+extraVolumes: []
+  ## Example: Add secret volume
+  # - name: ca-cert
+  #   secret:
+  #     secretName: ca-cert
+  #     items:
+  #     - key: ca-cert
+  #       path: ca_cert
+
+## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+vaultSecrets:
+  enabled: false
+  secret: ""
+  host: &host "${myvault.secrets.confluence-server-db-host}"
+  db: &db "${myvault.secrets.confluence-server-db}"
+  user: &db-user "${myvault.secrets.confluence-server-db-user}"
+  pw: &db-pw "${myvault.secrets.confluence-server-db-pw}"
+
+## Set up update strategy for confluence installation. Set to Recreate if you use persistent volume
+## that cannot be mounted by more than one pods to make sure the pods is destroyed first.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+updateStrategy: []
+# type: RollingUpdate
+# type: Recreate
+#  rollingUpdate:
+#    maxUnavailable: 25%
+#    maxSurge: 25%
+
+## Use an alternate scheduler, e.g. "stork".
+## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+schedulerName: ""
+
+## Container Probes
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+## Depending what values we give, Confluence won't be reachable. In doubt, leave it as it is.
+readinessProbe: {}
+#  initialDelaySeconds: 300
+#  periodSeconds: 30
+#  failureThreshold: 6
+#  timeoutSeconds: 10
+
+livenessProbe: {}
+#  initialDelaySeconds: 480
+#  periodSeconds: 30
+#  failureThreshold: 6
+#  timeoutSeconds: 10
+
+##
+## Postgresql chart configuration
+## https://github.com/helm/charts/blob/master/stable/postgresql/values.yaml
+##
+postgresql:
+  ## Whether to deploy a postgres server to satisfy the applications database requirements.
+  enabled: true
+
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: "10"
+    pullPolicy: IfNotPresent
+
+  fullnameOverride: confluence-server-db
+
+  # persistence:
+  #   size: 8Gi
+
+  initdbScriptsConfigMap: |-
+    {{ .Release.Name }}-db-helper-cm
+
+##
+## If postgresql is enabled and no database exists, it will be created (see db-helper ConfigMap)
+## by default, vaultSecret* are mapped here
+## If vaultSecrets.enabled is false, replace values below in plaintext,
+## password will be send to externaldb-secrets
+##
+## Aliases enabled, using vaultSecrets anchors.
+databaseConnection:
+  ## Database host
+  #host: confluence-server-db
+  host: *host
+
+  ## non-root Username for Confluence Database
+  #user: confluence-user
+  user: *db-user
+
+  ## Database password
+  #password: ""
+  password: *db-pw
+
+  ## Database name
+  #database: confluence-db
+  database: *db
+
+  ## lc_collate and lc_ctype, only in case database needs to be created
+  lang: C
+
+  ## Database port number
+  port: 5432
+
+  ## Database Type
+  type: postgresql
+
+## DB DROP, use with caution!
+## If postgresql.enabled is set to true and database exists, it will drop the db before creating a new one
+## (see db-helper ConfigMap)
+## This shouldn't be changed manually, instead run helm with --set databaseDrop.enabled=true --set databaseDrop.dropIt="yes"
+## to be sure that you know what you are doing
+databaseDrop:
+  enabled: false
+  dropIt: "no"
+
+##
+## Confluence specific configurations
+## https://hub.docker.com/r/atlassian/confluence-server
+## confluence/secrets/cas
+caCerts: {}
+  # secret: my-secret
+  # storepass: my-store-password
+# caCertsEnv:
+#   - name: VARIABLE
+#     value: my-value
+#
+## Environment Variables that will be injected in the ConfigMap
+## Default values unless otherwise stated
+envVars: {}
+  ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
+  ## default: 1024m
+  JVM_MINIMUM_MEMORY: 2048m
+  ## Memory / Heap Size (JVM_MAXIMUM_MEMORY) Mandatory, see @Notes above
+  ## default: 1024m
+  JVM_MAXIMUM_MEMORY: 2048m
+  #
+  ## Tomcat and Reverse Proxy Settings
+  ## Confluence running behind a reverse proxy server options
+  # ATL_PROXY_NAME: ""
+  # ATL_PROXY_PORT: ""
+  # ATL_TOMCAT_PORT: 8090
+  # ATL_TOMCAT_SCHEME: http
+  # ATL_TOMCAT_SECURE: false
+  # ATL_TOMCAT_CONTEXTPATH: ""
+  #
+  ## Tomcat/Catalina options
+  ## ref: https://tomcat.apache.org/tomcat-7.0-doc/config/index.html
+  # ATL_TOMCAT_MGMT_PORT: 8000
+  # ATL_TOMCAT_MAXTHREADS: 100
+  # ATL_TOMCAT_MINSPARETHREADS: 10
+  # ATL_TOMCAT_CONNECTIONTIMEOUT: 20000
+  # ATL_TOMCAT_ENABLELOOKUPS: false
+  # ATL_TOMCAT_PROTOCOL: "HTTP/1.1"
+  # ATL_TOMCAT_ACCEPTCOUNT: 10
+  #
+  ## Cookie age (Remember Me maximum time remain logged-in)
+  # ATL_AUTOLOGIN_COOKIE_AGE: 1209600
+  #
+  ## Home directory. This may be on a mounted volume; if so it
+  ## should be writable by the user confluence. See note below about UID mappings.
+  # CONFLUENCE_HOME: ""
+  #
+  ## Database configuration
+  ## The following variables are all must all be supplied if using this feature:
+  #ATL_JDBC_URL: "jdbc:postgresql://wiki-stage-db:5432/${vault.secrets.wiki-stage-db}"
+  #ATL_JDBC_USER: "${vault.secrets.wiki-stage-db-user}"
+  #ATL_JDBC_PASSWORD: "${vault.secrets.wiki-stage-db-pw}"
+  #ATL_DB_TYPE: postgresql
+  #
+  ## Optional connection pool database settings
+  # ATL_DB_POOLMINSIZE: 20
+  # ATL_DB_POOLMAXSIZE: 100
+  # ATL_DB_TIMEOUT: 30
+  # ATL_DB_IDLETESTPERIOD: 100
+  # ATL_DB_MAXSTATEMENTS: 0
+  # ATL_DB_VALIDATE: false
+  # ATL_DB_ACQUIREINCREMENT: 1
+  # ATL_DB_VALIDATIONQUERY: "select 1"
+## End of Environment Variables (envVars)
+
+## JVM_SUPPORT_RECOMMENDED_ARGS
+## Additional container environment variables
+extraEnv:
+  enabled: false
+  parameters:
+    # -Djavax.net.ssl.trustStore=/var/atlassian/application-data/confluence/cacerts
+    # -XX:MaxMetaspaceSize: 512m
+    # -XX:MaxDirectMemorySize: 10m
+    # -Dsynchrony.memory.max: 0m
