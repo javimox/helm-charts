@@ -68,20 +68,20 @@ spec:
             - name: http
               containerPort: 8090
               protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /status
-              port: http
-            {{- range $key, $val := .Values.readinessProbe }}
-            {{ $key }}: {{ $val }}
-            {{- end }}
-          livenessProbe:
-            httpGet:
-              path: /status
-              port: http
-            {{- range $key, $val := .Values.livenessProbe }}
-            {{ $key }}: {{ $val }}
-            {{- end }}
+          # readinessProbe:
+          #  httpGet:
+          #    path: /status
+          #    port: http
+          #  {{- range $key, $val := .Values.readinessProbe }}
+          #  {{ $key }}: {{ $val }}
+          #  {{- end }}
+          # livenessProbe:
+          #  httpGet:
+          #    path: /status
+          #    port: http
+          #  {{- range $key, $val := .Values.livenessProbe }}
+          #  {{ $key }}: {{ $val }}
+          #  {{- end }}
           volumeMounts:
             - mountPath: /var/atlassian/application-data/confluence
               name: {{ include "confluence-server.pvcHome" . }}
