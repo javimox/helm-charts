@@ -230,7 +230,7 @@ postgresql:
   image:
     registry: docker.io
     repository: bitnami/postgresql
-    tag: "10.12.0"
+    tag: "10"
     pullPolicy: IfNotPresent
 
   fullnameOverride: confluence-server-db
