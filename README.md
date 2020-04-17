@@ -1,8 +1,6 @@
-# Charts Repo Actions Demo
+# Charts Repo Actions
 
-[![](https://github.com/helm/charts-repo-actions-demo/workflows/Release%20Charts/badge.svg?branch=master)](https://github.com/helm/charts-repo-actions-demo/actions)
-
-Example project to demo testing and hosting a chart repository with GitHub Pages and Actions.
+[![](https://github.com/javimox/helm-charts/workflows/Release%20Charts/badge.svg?branch=master)](https://github.com/javimox/helm-charts/actions)
 
 ## Actions
 
