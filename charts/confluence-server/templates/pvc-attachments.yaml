@@ -1,0 +1,25 @@
+{{- if and .Values.mountAttachments.enabled (not .Values.mountAttachments.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "confluence-server.pvcAttachments" . }}
+  labels:
+    {{- include "confluence-server.labels" . | nindent 4 }}
+  {{- with .Values.mountAttachments.annotations }}
+  annotations:
+    {{ . | toYaml | trim | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.mountAttachments.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.mountAttachments.size | quote }}
+  {{- with .Values.mountAttachments.storageClass }}
+  {{- if (eq "-" .) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}
