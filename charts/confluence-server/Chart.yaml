@@ -19,7 +19,7 @@ icon: https://www.atlassian.com/dam/jcr:1b7f4009-27d0-4882-8629-cecae97fc00f/Con
 dependencies:
   - name: postgresql
     version: 8.6.4
-    repository:  https://kubernetes-charts.storage.googleapis.com
+    repository: https://kubernetes-charts.storage.googleapis.com
     condition: postgresql.enabled
     tags:
       - postgres
