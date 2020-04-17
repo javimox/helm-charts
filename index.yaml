@@ -1,0 +1,111 @@
+apiVersion: v1
+entries:
+  confluence-server:
+  - apiVersion: v2
+    appVersion: 7.3.3
+    created: "2020-04-17T13:33:55.129318497Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://kubernetes-charts.storage.googleapis.com
+      tags:
+      - postgres
+      version: 8.6.4
+    description: Wiki collaboration platform
+    digest: b44ecc914d0d434b17bbd737eb340ae374abda187919f6c96b906df5f1520ea0
+    home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+    icon: https://www.atlassian.com/dam/jcr:1b7f4009-27d0-4882-8629-cecae97fc00f/Confluence-blue.svg
+    keywords:
+    - wiki
+    - confluence
+    - confluence-server
+    - atlassian
+    - documentation
+    - application
+    maintainers:
+    - email: jmox@protonmail.com
+      name: jmox
+    name: confluence-server
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/confluence-server
+    type: application
+    urls:
+    - https://github.com/javimox/charts/releases/download/confluence-server-0.1.1/confluence-server-0.1.1.tgz
+    version: 0.1.1
+  dependencies-v1:
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: "2020-04-17T13:33:55.208007733Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com
+      version: 10.5.13
+    description: Chart to test dependencies
+    digest: 46c83177ede61627d1c5d0cd4a677a0b5e91359f1b32ff3cd51567e2ea44fd09
+    home: https://github.com/helm/charts-repo-actions-demo
+    maintainers:
+    - email: email@example.com
+      name: Name
+    name: dependencies-v1
+    sources:
+    - https://github.com/helm/charts-repo-actions-demo
+    urls:
+    - https://github.com/javimox/charts/releases/download/dependencies-v1-0.1.2/dependencies-v1-0.1.2.tgz
+    version: 0.1.2
+  dependencies-v2:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2020-04-17T13:33:55.296072273Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com
+      version: 10.5.13
+    description: Chart to test dependencies
+    digest: 515aeb2e102e22fb75ce9bbc47249207ec95023dfda0465b1889f7a8f2e56032
+    home: https://github.com/helm/charts-repo-actions-demo
+    maintainers:
+    - email: email@example.com
+      name: Name
+    name: dependencies-v2
+    sources:
+    - https://github.com/helm/charts-repo-actions-demo
+    urls:
+    - https://github.com/javimox/charts/releases/download/dependencies-v2-0.1.2/dependencies-v2-0.1.2.tgz
+    version: 0.1.2
+  example-v1:
+  - apiVersion: v1
+    appVersion: "3.9"
+    created: "2020-04-17T13:33:55.370224079Z"
+    description: Deploy a basic Alpine Linux pod
+    digest: ffccf62bdc0564f5bdb6c691409c48d7f693659f3d0192ba7740477656b4a2d1
+    home: https://helm.sh/helm
+    maintainers:
+    - email: email@example.com
+      name: Name
+    name: example-v1
+    sources:
+    - https://github.com/helm/helm
+    urls:
+    - https://github.com/javimox/charts/releases/download/example-v1-0.1.5/example-v1-0.1.5.tgz
+    version: 0.1.5
+  example-v2:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2020-04-17T13:33:55.446389365Z"
+    description: A Helm chart for Kubernetes
+    digest: b900be6ef43c0a09056fbdbaddb10abe6b7414878ab7f235b0ddd7b210cafb11
+    home: https://helm.sh/helm
+    maintainers:
+    - email: email@example.com
+      name: Name
+    name: example-v2
+    sources:
+    - https://github.com/helm/helm
+    urls:
+    - https://github.com/javimox/charts/releases/download/example-v2-0.2.2/example-v2-0.2.2.tgz
+    version: 0.2.2
+generated: "2020-04-17T13:33:55.039487111Z"
