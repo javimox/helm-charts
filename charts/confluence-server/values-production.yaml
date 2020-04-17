@@ -250,19 +250,19 @@ postgresql:
 ## Aliases enabled, using vaultSecrets anchors.
 databaseConnection:
   ## Database host
-  #host: confluence-server-db
+  # host: confluence-server-db
   host: *host
 
   ## non-root Username for Confluence Database
-  #user: confluence-user
+  # user: confluence-user
   user: *db-user
 
   ## Database password
-  #password: ""
+  # password: ""
   password: *db-pw
 
   ## Database name
-  #database: confluence-db
+  # database: confluence-db
   database: *db
 
   ## lc_collate and lc_ctype, only in case database needs to be created
@@ -332,10 +332,10 @@ envVars: {}
   #
   ## Database configuration
   ## The following variables are all must all be supplied if using this feature:
-  #ATL_JDBC_URL: "jdbc:postgresql://wiki-stage-db:5432/${vault.secrets.wiki-stage-db}"
-  #ATL_JDBC_USER: "${vault.secrets.wiki-stage-db-user}"
-  #ATL_JDBC_PASSWORD: "${vault.secrets.wiki-stage-db-pw}"
-  #ATL_DB_TYPE: postgresql
+  # ATL_JDBC_URL: "jdbc:postgresql://confluence-server-db-host:5432/${vault.secrets.confluence-server-db}"
+  # ATL_JDBC_USER: "${vault.secrets.confluence-server-db-user}"
+  # ATL_JDBC_PASSWORD: "${vault.secrets.confluence-server-db-password}"
+  # ATL_DB_TYPE: postgresql
   #
   ## Optional connection pool database settings
   # ATL_DB_POOLMINSIZE: 20
