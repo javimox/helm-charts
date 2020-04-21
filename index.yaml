@@ -3,6 +3,39 @@ entries:
   confluence-server:
   - apiVersion: v2
     appVersion: 7.3.3
+    created: "2020-04-21T09:42:35.989056335Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://kubernetes-charts.storage.googleapis.com
+      tags:
+      - postgres
+      version: 8.6.4
+    description: Wiki collaboration platform
+    digest: 0fcd87f85e8fa24213df773dfdae0b271e770b0df4279a1ebd902d760ddbeaa7
+    home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+    icon: https://www.atlassian.com/dam/jcr:1b7f4009-27d0-4882-8629-cecae97fc00f/Confluence-blue.svg
+    keywords:
+    - wiki
+    - confluence
+    - confluence-server
+    - atlassian
+    - documentation
+    - application
+    maintainers:
+    - email: jmox@protonmail.com
+      name: jmox
+    name: confluence-server
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/confluence-server
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/confluence-server-0.1.3/confluence-server-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: 7.3.3
     created: "2020-04-17T23:35:52.156136548Z"
     dependencies:
     - condition: postgresql.enabled
