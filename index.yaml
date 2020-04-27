@@ -98,6 +98,6 @@ entries:
     - https://hub.docker.com/r/atlassian/confluence-server
     type: application
     urls:
-    - https://github.com/javimox/charts/releases/download/confluence-server-0.1.1/confluence-server-0.1.1.tgz
+    - https://github.com/javimox/helm-charts/releases/download/confluence-server-0.1.1/confluence-server-0.1.1.tgz
     version: 0.1.1
 generated: "2020-04-17T13:33:55.039487111Z"
