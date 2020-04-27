@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "jira-software.fullname" . }}
+  labels:
+    {{- include "jira-software.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+  - name: http
+    port: 80
+    targetPort: {{ .Values.service.port }}
+    {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePorts.http)))}}
+    nodePort: {{ .Values.service.nodePorts.http }}
+    {{- end }}
+    protocol: TCP
+  {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.httpsPort)))}}
+  - name: https
+    port: 443
+    targetPort: {{ .Values.service.httpsPort }}
+    {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePorts.https)))}}
+    nodePort: {{ .Values.service.nodePorts.https }}
+    {{- end }}
+  {{- end }}
+  selector:
+    {{- include "jira-software.selectorLabels" . | nindent 4 }}
+

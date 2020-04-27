@@ -1,0 +1,20 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- if .Values.vaultSecrets.enabled }}
+  annotations:
+    vault.secrets: {{ .Values.vaultSecrets.secret | quote }}
+  {{- end }}
+  name:  {{ .Release.Name }}-db-helper-cm
+  labels:
+    {{- include "jira-software.labels" . | nindent 4 }}
+data:
+  setup.sql: |
+    {{- if and .Values.databaseDrop.enabled (eq .Values.databaseDrop.dropIt "yes") }}
+    DROP DATABASE {{ .Values.databaseConnection.database }};
+    {{- end }}
+    CREATE USER {{ .Values.databaseConnection.user }} WITH PASSWORD '{{ .Values.databaseConnection.password }}';
+    CREATE DATABASE {{ .Values.databaseConnection.database }} WITH OWNER {{ .Values.databaseConnection.user }}
+      ENCODING 'UTF8' LC_COLLATE='{{ .Values.databaseConnection.lang }}' LC_CTYPE='{{ .Values.databaseConnection.lang }}' TEMPLATE template0;
+{{- end }}
