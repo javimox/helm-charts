@@ -221,70 +221,100 @@ It is possible to remove an existing Jira database while deploying. Useful if, e
 If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `yes`, then removes the database specified on `databaseConnection.database`, if it exists.
 
 ```console
-$ diff values.yaml values-production.yaml
-61c61
-<   type: ClusterIP
----
->   type: NodePort
-101c101
-<     memory: 1Gi
----
->     memory: 2Gi
-103,104c103,104
-< #  limits:
-< #    memory: 1Gi
----
->   limits:
->     memory: 2Gi
-164,165c164,165
-<   enabled: false
-<   secret: ""
----
->   enabled: true
->   secret: "mysecret-jira-software"
-218c218
-<     size: 8Gi
----
->     size: 20Gi
-232,233c232,233
-<   # host: *host
-<   host: jira-software-db
----
->   # host: jira-software-db
->   host: *host
-236,237c236,238
-<   # user: *db-user
-<   user: jirauser
----
->   # user: jirauser
->   user: *db-user
->
-240,242c241,243
-<   # password: *db-pw
-<   password: ""
-<
----
->   # password: ""
->   password: *db-pw
->
-244,245c245,246
-<   # database: *db
-<   database: jiradb
----
->   # database: jiradb
->   database: *db
-299c300
-< envVars: {}
----
-> envVars:
-303c304
-<   # JVM_MINIMUM_MEMORY: 2048m
----
->   JVM_MINIMUM_MEMORY: 2048m
-306c307
-<   # JVM_MAXIMUM_MEMORY: 2048m
----
->   JVM_MAXIMUM_MEMORY: 2048m
+--- jira-software/values.yaml
++++ jira-software/values-production.yaml
+@@ -58,7 +58,7 @@
+ ## Kubernetes svc configuration
+ service:
+   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
+-  type: ClusterIP
++  type: NodePort
+   ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
+   ##
+   ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
+@@ -98,10 +98,10 @@
+ ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+ resources:
+   requests:
+-    memory: 1Gi
++    memory: 2Gi
+     cpu: 500m
+-#  limits:
+-#    memory: 1Gi
++  limits:
++    memory: 2Gi
+ 
+ ## Replication (without ReplicaSet)
+ ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+@@ -161,8 +161,8 @@
+ 
+ ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+ vaultSecrets:
+-  enabled: false
+-  secret: ""
++  enabled: true
++  secret: "mysecret-jira-software"
+   host: &host "${myvault.secrets.jira-software-db-host}"
+   db: &db "${myvault.secrets.jira-software-db}"
+   user: &db-user "${myvault.secrets.jira-software-db-user}"
+@@ -215,7 +215,7 @@
+   fullnameOverride: jira-software-db
+ 
+   persistence:
+-    size: 8Gi
++    size: 20Gi
+ 
+   initdbScriptsConfigMap: |-
+     {{ .Release.Name }}-db-helper-cm
+@@ -229,20 +229,21 @@
+ ## Aliases disabled, not using vaultSecrets anchors.
+ databaseConnection:
+   ## Database host
+-  # host: *host
+-  host: jira-software-db
++  # host: jira-software-db
++  host: *host
+ 
+   ## non-root Username for Jira Database
+-  # user: *db-user
+-  user: jirauser
++  # user: jirauser
++  user: *db-user
++  
+ 
+   ## Database password
+-  # password: *db-pw
+-  password: ""
+-
++  # password: ""
++  password: *db-pw
++  
+   ## Database name
+-  # database: *db
+-  database: jiradb
++  # database: jiradb
++  database: *db
+ 
+   ## lc_collate and lc_ctype, only in case database needs to be created
+   lang: C
+@@ -296,14 +297,14 @@
+ #
+ ## Environment Variables that will be injected in the ConfigMap
+ ## Default values unless otherwise stated
+-envVars: {}
++envVars:
+   #
+   ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
+   ## default: 1024m
+-  # JVM_MINIMUM_MEMORY: 2048m
++  JVM_MINIMUM_MEMORY: 2048m
+   ## Memory / Heap Size (JVM_MAXIMUM_MEMORY) Mandatory, see @Notes above
+   ## default: 1024m
+-  # JVM_MAXIMUM_MEMORY: 2048m
++  JVM_MAXIMUM_MEMORY: 2048m
+   ## The reserved code cache size of the JVM
+   # JVM_RESERVED_CODE_CACHE_SIZE: 512m
+   #
 ```
 
 ## Links
