@@ -231,20 +231,39 @@ $ helm upgrade --install my-release \
 ```console
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
-@@ -102,10 +102,10 @@
+@@ -10,7 +10,7 @@
+ image:
+   # registry: hub.docker.com
+   repository: atlassian/confluence-server
+-  tag: latest
++  tag: 7.3.3
+   ## Specify a imagePullPolicy
+   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+@@ -58,7 +58,7 @@
+ ## Kubernetes svc configuration
+ service:
+   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
+-  type: ClusterIP
++  type: NodePort
+   ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
+   ##
+   ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
+@@ -98,10 +98,10 @@
  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
  resources:
    requests:
 -    memory: 1Gi
 +    memory: 2Gi
      cpu: 500m
- #  limits:
+-#  limits:
 -#    memory: 1Gi
-+#    memory: 2Gi
++  limits:
++    memory: 2Gi
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -149,11 +149,11 @@
+@@ -145,11 +145,11 @@
  ## Persistent Volume CLaim
  ## Confluence Attachments directory
  mountAttachments:
@@ -258,7 +277,18 @@ $ helm upgrade --install my-release \
  
    ## If defined, storageClassName: <storageClass>
    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-@@ -235,8 +235,8 @@
+@@ -178,8 +178,8 @@
+ 
+ ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+ vaultSecrets:
+-  enabled: false
+-  secret: ""
++  enabled: true
++  secret: "mysecret-confluence-server"
+   host: &host "${myvault.secrets.confluence-server-db-host}"
+   db: &db "${myvault.secrets.confluence-server-db}"
+   user: &db-user "${myvault.secrets.confluence-server-db-user}"
+@@ -231,8 +231,8 @@
  
    fullnameOverride: confluence-server-db
  
@@ -269,7 +299,7 @@ $ helm upgrade --install my-release \
  
    initdbScriptsConfigMap: |-
      {{ .Release.Name }}-db-helper-cm
-@@ -247,23 +247,23 @@
+@@ -243,23 +243,23 @@
  ## If vaultSecrets.enabled is false, replace values below in plaintext,
  ## password will be send to externaldb-secrets
  ##
@@ -277,33 +307,37 @@ $ helm upgrade --install my-release \
 +## Aliases enabled, using vaultSecrets anchors.
  databaseConnection:
    ## Database host
--  #host: *host
+-  # host: *host
 -  host: confluence-server-db
-+  #host: localhost
++  # host: confluence-server-db
 +  host: *host
  
    ## non-root Username for Confluence Database
--  #user: *db-user
+-  # user: *db-user
 -  user: confluence-user
-+  #user: confluence-user
++  # user: confluence-user
 +  user: *db-user
  
    ## Database password
--  #password: *db-pw
+-  # password: *db-pw
 -  password: ""
-+  #password: "mypassword"
++  # password: ""
 +  password: *db-pw
  
    ## Database name
--  #database: *db
+-  # database: *db
 -  database: confluence-db
-+  #database: confluence-db
++  # database: confluence-db
 +  database: *db
  
    ## lc_collate and lc_ctype, only in case database needs to be created
    lang: C
-@@ -299,10 +299,10 @@
- envVars: {}
+@@ -292,13 +292,13 @@
+ #
+ ## Environment Variables that will be injected in the ConfigMap
+ ## Default values unless otherwise stated
+-envVars: {}
++envVars:
    ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
    ## default: 1024m
 -  # JVM_MINIMUM_MEMORY: 2048m

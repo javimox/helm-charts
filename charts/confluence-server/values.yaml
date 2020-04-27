@@ -58,7 +58,7 @@ securityContext: {}
 ## Kubernetes svc configuration
 service:
   ## For minikube, set this to NodePort, elsewhere use LoadBalancer
-  type: NodePort
+  type: ClusterIP
   ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
   ##
   ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
@@ -325,13 +325,6 @@ envVars: {}
   ## Home directory. This may be on a mounted volume; if so it
   ## should be writable by the user confluence. See note below about UID mappings.
   # CONFLUENCE_HOME: ""
-  #
-  ## Database configuration
-  ## The following variables are all must all be supplied if using this feature:
-  # ATL_JDBC_URL: "jdbc:postgresql://confluence-server-db-host:5432/${vault.secrets.confluence-server-db}"
-  # ATL_JDBC_USER: "${vault.secrets.confluence-server-db-user}"
-  # ATL_JDBC_PASSWORD: "${vault.secrets.confluence-server-db-password}"
-  # ATL_DB_TYPE: postgresql
   #
   ## Optional connection pool database settings
   # ATL_DB_POOLMINSIZE: 20

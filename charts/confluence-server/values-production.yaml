@@ -100,8 +100,8 @@ resources:
   requests:
     memory: 2Gi
     cpu: 500m
-#  limits:
-#    memory: 2Gi
+  limits:
+    memory: 2Gi
 
 ## Replication (without ReplicaSet)
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -178,8 +178,8 @@ extraVolumes: []
 
 ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
 vaultSecrets:
-  enabled: false
-  secret: ""
+  enabled: true
+  secret: "mysecret-confluence-server"
   host: &host "${myvault.secrets.confluence-server-db-host}"
   db: &db "${myvault.secrets.confluence-server-db}"
   user: &db-user "${myvault.secrets.confluence-server-db-user}"
@@ -292,7 +292,7 @@ caCerts: {}
 #
 ## Environment Variables that will be injected in the ConfigMap
 ## Default values unless otherwise stated
-envVars: {}
+envVars:
   ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
   ## default: 1024m
   JVM_MINIMUM_MEMORY: 2048m
@@ -325,13 +325,6 @@ envVars: {}
   ## Home directory. This may be on a mounted volume; if so it
   ## should be writable by the user confluence. See note below about UID mappings.
   # CONFLUENCE_HOME: ""
-  #
-  ## Database configuration
-  ## The following variables are all must all be supplied if using this feature:
-  # ATL_JDBC_URL: "jdbc:postgresql://confluence-server-db-host:5432/${vault.secrets.confluence-server-db}"
-  # ATL_JDBC_USER: "${vault.secrets.confluence-server-db-user}"
-  # ATL_JDBC_PASSWORD: "${vault.secrets.confluence-server-db-password}"
-  # ATL_DB_TYPE: postgresql
   #
   ## Optional connection pool database settings
   # ATL_DB_POOLMINSIZE: 20
