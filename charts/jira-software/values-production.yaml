@@ -10,7 +10,7 @@
 image:
   # registry: hub.docker.com
   repository: atlassian/jira-software
-  tag: 8.8.0
+  tag: 8.9.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
