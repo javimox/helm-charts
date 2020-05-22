@@ -14,7 +14,8 @@
 
 ## Chart Sources
 
-* `charts/confluence-server`: Atlassian Confluence Server chart
+* `charts/confluence-server`: Atlassian Confluence Server chart @ [helm.mox.sh](https://mox.sh/helm/charts/confluence-server/)
+* `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
 
 ## Adding charts to the mox helm repository
 
