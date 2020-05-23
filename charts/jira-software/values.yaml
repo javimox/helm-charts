@@ -245,7 +245,7 @@ databaseConnection:
 
   ## Database password
   # password: *db-pw
-  password: "blabla"
+  password: ""
 
   ## Database name
   # database: *db

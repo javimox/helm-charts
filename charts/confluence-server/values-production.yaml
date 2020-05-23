@@ -177,6 +177,7 @@ extraVolumes: []
   #       path: ca_cert
 
 ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+## Change double-quoted values if enabled is set to 'true'
 vaultSecrets:
   enabled: true
   secret: "mysecret-confluence-server"
@@ -189,8 +190,8 @@ vaultSecrets:
 ## that cannot be mounted by more than one pods to make sure the pods is destroyed first.
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 updateStrategy: []
-# type: RollingUpdate
-# type: Recreate
+#  type: RollingUpdate
+#  type: Recreate
 #  rollingUpdate:
 #    maxUnavailable: 25%
 #    maxSurge: 25%
@@ -204,12 +205,18 @@ schedulerName: ""
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
 ## Depending what values we give, Confluence won't be reachable. In doubt, leave it as it is.
 readinessProbe: {}
+#  httpGet:
+#    path: /status
+#    port: http
 #  initialDelaySeconds: 300
 #  periodSeconds: 30
 #  failureThreshold: 6
 #  timeoutSeconds: 10
 
 livenessProbe: {}
+#  httpGet:
+#    path: /status
+#    port: http
 #  initialDelaySeconds: 480
 #  periodSeconds: 30
 #  failureThreshold: 6
@@ -250,7 +257,7 @@ databaseConnection:
   host: *host
 
   ## non-root Username for Confluence Database
-  # user: confluence-user
+  # user: confluenceuser
   user: *db-user
 
   ## Database password
@@ -258,7 +265,7 @@ databaseConnection:
   password: *db-pw
 
   ## Database name
-  # database: confluence-db
+  # database: confluencedb
   database: *db
 
   ## lc_collate and lc_ctype, only in case database needs to be created

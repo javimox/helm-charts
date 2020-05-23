@@ -156,11 +156,15 @@ The following tables lists the configurable parameters of the Confluence Server 
 | `updateStrategy`                              | Update strategy policy                                                                                                                                                    | `[]`                                                          |
 | `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                                                                   | `""`                                                          |
 | `readinessProbe`                              | Readiness probe values                                                                                                                                                    | `{}`                                                          |
+| `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Confluence handler is `/status`)                                                                                                  | `nil`                                                         |
+| `readinessProbe.httpGet.port`                 | Readiness probe port (Note: Confluence listens on internal port 8090)                                                                                                     | `nil`                                                         |
 | `readinessProbe.initialDelaySeconds`          | Delay before readiness probe is initiated                                                                                                                                 | `nil`                                                         |
 | `readinessProbe.periodSeconds`                | How often to perform the probe                                                                                                                                            | `nil`                                                         |
 | `readinessProbe.failureThreshold`             | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
 | `readinessProbe.timeoutSeconds`               | When the probe times out                                                                                                                                                  | `nil`                                                         |
 | `livenessProbe`                               | Liveness probe values                                                                                                                                                     | `{}`                                                          |
+| `livenessProbe.httpGet.path`                  | Liveness probe HTTP GET request (Note: Confluence handler is `/status`)                                                                                                   | `nil`                                                         |
+| `livenessProbe.httpGet.port`                  | Liveness probe port (Note: Confluence listens on internal port 8090)                                                                                                      | `nil`                                                         |
 | `livenessProbe.initialDelaySeconds`           | Delay before liveness probe is initiated                                                                                                                                  | `nil`                                                         |
 | `livenessProbe.periodSeconds`                 | How often to perform the probe                                                                                                                                            | `nil`                                                         |
 | `livenessProbe.failureThreshold`              | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
@@ -231,15 +235,6 @@ $ helm upgrade --install my-release \
 ```console
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
-@@ -10,7 +10,7 @@
- image:
-   # registry: hub.docker.com
-   repository: atlassian/confluence-server
--  tag: latest
-+  tag: 7.3.3
-   ## Specify a imagePullPolicy
-   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
 @@ -58,7 +58,7 @@
  ## Kubernetes svc configuration
  service:
@@ -277,9 +272,9 @@ $ helm upgrade --install my-release \
  
    ## If defined, storageClassName: <storageClass>
    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-@@ -178,8 +178,8 @@
- 
+@@ -179,8 +179,8 @@
  ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+ ## Change double-quoted values if enabled is set to 'true'
  vaultSecrets:
 -  enabled: false
 -  secret: ""
@@ -288,7 +283,7 @@ $ helm upgrade --install my-release \
    host: &host "${myvault.secrets.confluence-server-db-host}"
    db: &db "${myvault.secrets.confluence-server-db}"
    user: &db-user "${myvault.secrets.confluence-server-db-user}"
-@@ -231,8 +231,8 @@
+@@ -238,8 +238,8 @@
  
    fullnameOverride: confluence-server-db
  
@@ -299,7 +294,7 @@ $ helm upgrade --install my-release \
  
    initdbScriptsConfigMap: |-
      {{ .Release.Name }}-db-helper-cm
-@@ -243,23 +243,23 @@
+@@ -250,23 +250,23 @@
  ## If vaultSecrets.enabled is false, replace values below in plaintext,
  ## password will be send to externaldb-secrets
  ##
@@ -314,8 +309,8 @@ $ helm upgrade --install my-release \
  
    ## non-root Username for Confluence Database
 -  # user: *db-user
--  user: confluence-user
-+  # user: confluence-user
+-  user: confluenceuser
++  # user: confluenceuser
 +  user: *db-user
  
    ## Database password
@@ -326,13 +321,13 @@ $ helm upgrade --install my-release \
  
    ## Database name
 -  # database: *db
--  database: confluence-db
-+  # database: confluence-db
+-  database: confluencedb
++  # database: confluencedb
 +  database: *db
  
    ## lc_collate and lc_ctype, only in case database needs to be created
    lang: C
-@@ -292,13 +292,13 @@
+@@ -299,13 +299,13 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
@@ -355,4 +350,4 @@ $ helm upgrade --install my-release \
 
 * [Atlassian Confluence](https://confluence.atlassian.com/confeval/confluence-evaluator-resources/confluence-features-functions)
 * [Helm](https://helm.sh/)
-* [mox](https://mox.sh/)
+* [mox](https://helm.mox.sh/)

@@ -151,11 +151,15 @@ The following tables lists the configurable parameters of the Jira Software char
 | `updateStrategy`                              | Update strategy policy                                                                                                                                                    | `[]`                                                          |
 | `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                                                                   | `""`                                                          |
 | `readinessProbe`                              | Readiness probe values                                                                                                                                                    | `{}`                                                          |
+| `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Jira handler is `/status`)                                                                                                        | `nil`                                                         |
+| `readinessProbe.httpGet.port`                 | Readiness probe port (Note: Jira listens on internal port 8080)                                                                                                           | `nil`                                                         |
 | `readinessProbe.initialDelaySeconds`          | Delay before readiness probe is initiated                                                                                                                                 | `nil`                                                         |
 | `readinessProbe.periodSeconds`                | How often to perform the probe                                                                                                                                            | `nil`                                                         |
 | `readinessProbe.failureThreshold`             | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
 | `readinessProbe.timeoutSeconds`               | When the probe times out                                                                                                                                                  | `nil`                                                         |
 | `livenessProbe`                               | Liveness probe values                                                                                                                                                     | `{}`                                                          |
+| `livenessProbe.httpGet.path`                  | Liveness probe HTTP GET request (Note: Jira handler is `/status`)                                                                                                         | `nil`                                                         |
+| `livenessProbe.httpGet.port`                  | Liveness probe port (Note: Jira listens on internal port 8080)                                                                                                            | `nil`                                                         |
 | `livenessProbe.initialDelaySeconds`           | Delay before liveness probe is initiated                                                                                                                                  | `nil`                                                         |
 | `livenessProbe.periodSeconds`                 | How often to perform the probe                                                                                                                                            | `nil`                                                         |
 | `livenessProbe.failureThreshold`              | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
@@ -223,7 +227,25 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
 ```console
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
-@@ -58,7 +58,7 @@
+@@ -46,19 +46,19 @@
+ ## Security context
+ ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+ securityContext: {}
+-#  capabilities:
+-#    drop:
+-#    - ALL
+-#  readOnlyRootFilesystem: true
+-#  runAsNonRoot: true
+-#  runAsUser: 1000
++  # capabilities:
++  #   drop:
++  #   - ALL
++  # readOnlyRootFilesystem: true
++  # runAsNonRoot: true
++  # runAsUser: 1000
+ 
+ ## Service/Networking
+ ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
  ## Kubernetes svc configuration
  service:
    ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -246,9 +268,9 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -161,8 +161,8 @@
- 
- ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+@@ -162,8 +162,8 @@
+ ## Pull secrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
+ ## Change double-quoted values if enabled is set to 'true'
  vaultSecrets:
 -  enabled: false
 -  secret: ""
@@ -257,7 +279,7 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
    host: &host "${myvault.secrets.jira-software-db-host}"
    db: &db "${myvault.secrets.jira-software-db}"
    user: &db-user "${myvault.secrets.jira-software-db-user}"
-@@ -215,7 +215,7 @@
+@@ -222,7 +222,7 @@
    fullnameOverride: jira-software-db
  
    persistence:
@@ -266,7 +288,7 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
  
    initdbScriptsConfigMap: |-
      {{ .Release.Name }}-db-helper-cm
-@@ -229,20 +229,21 @@
+@@ -236,20 +236,20 @@
  ## Aliases disabled, not using vaultSecrets anchors.
  databaseConnection:
    ## Database host
@@ -278,10 +300,10 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
    ## non-root Username for Jira Database
 -  # user: *db-user
 -  user: jirauser
+-
 +  # user: jirauser
 +  user: *db-user
 +  
- 
    ## Database password
 -  # password: *db-pw
 -  password: ""
@@ -297,7 +319,7 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
  
    ## lc_collate and lc_ctype, only in case database needs to be created
    lang: C
-@@ -296,14 +297,14 @@
+@@ -303,14 +303,14 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated

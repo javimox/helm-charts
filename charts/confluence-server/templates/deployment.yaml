@@ -55,8 +55,10 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- if .Values.securityContext }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
@@ -66,20 +68,14 @@ spec:
             - name: http
               containerPort: 8090
               protocol: TCP
+          {{- if .Values.readinessProbe }}
           readinessProbe:
-            httpGet:
-              path: /status
-              port: http
-            {{- range $key, $val := .Values.readinessProbe }}
-            {{ $key }}: {{ $val }}
-            {{- end }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.livenessProbe }}
           livenessProbe:
-            httpGet:
-              path: /status
-              port: http
-            {{- range $key, $val := .Values.livenessProbe }}
-            {{ $key }}: {{ $val }}
-            {{- end }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - mountPath: /var/atlassian/application-data/confluence
               name: {{ include "confluence-server.pvcHome" . }}
