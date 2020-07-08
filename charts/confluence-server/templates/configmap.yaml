@@ -16,9 +16,3 @@ data:
   ATL_JDBC_USER: "{{ .Values.databaseConnection.user }}"
   ATL_JDBC_PASSWORD: {{ .Values.databaseConnection.password | quote }}
   ATL_DB_TYPE: "{{ .Values.databaseConnection.type }}"
-  {{- if .Values.extraEnv.enabled }}
-  JVM_SUPPORT_RECOMMENDED_ARGS: |-
-    {{- range $key, $val := .Values.extraEnv.parameters }}
-    {{ $key }}={{ $val }}
-    {{- end }}
-  {{- end }}

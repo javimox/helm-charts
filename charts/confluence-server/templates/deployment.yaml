@@ -24,15 +24,20 @@ spec:
     spec:
       {{- if .Values.caCerts }}
       initContainers:
+        - name: ca-cert
         - name: ca-certs
-          image: adoptopenjdk/openjdk11:alpine
+          image: adoptopenjdk:11-jdk-hotspot
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh", "-c"]
-          args:
-            - cp -f \"${JAVA_HOME}/lib/security/cacerts\" /var/atlassian/application-data/confluence/cacerts;
-              for f in /var/atlassian/application-data/confluence/secrets/cas/*;
-              do keytool -importcert -file \"${f}\" -alias \"$(basename \"${f}\")\" -keystore /var/atlassian/application-data/confluence/cacerts -storepass {{ .Values.caCerts.storepass | quote }} -trustcacerts -noprompt;
-              done;
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp -f ${JAVA_HOME}/lib/security/cacerts /var/atlassian/application-data/confluence/cacerts
+              for i in /var/atlassian/application-data/confluence/secrets/cas/* ; do
+                keytool -importcert -file ${f} -alias $(basename ${f}) \
+                  -keystore /var/atlassian/application-data/confluence/cacerts \
+                  -storepass changeit -trustcacerts -noprompt
+              done
           volumeMounts:
             - mountPath: /var/atlassian/application-data/confluence
               name: {{ include "confluence-server.pvcHome" . }}
@@ -64,6 +69,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "confluence-server.fullname" . }}-cm
+          env:
+            - name: JVM_SUPPORT_RECOMMENDED_ARGS
+              value: "{{ default "" .Values.extraEnv }}\
+                {{ if .Values.caCerts }} -Djavax.net.ssl.trustStore=/var/atlassian/application-data/confluence/cacerts {{ end }}"
           ports:
             - name: http
               containerPort: 8090
