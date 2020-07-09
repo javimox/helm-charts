@@ -24,7 +24,6 @@ spec:
     spec:
       {{- if .Values.caCerts }}
       initContainers:
-        - name: ca-cert
         - name: ca-certs
           image: adoptopenjdk:11-jdk-hotspot
           imagePullPolicy: {{ .Values.image.pullPolicy }}
