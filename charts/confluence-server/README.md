@@ -190,8 +190,7 @@ The following tables lists the configurable parameters of the Confluence Server 
 | `caCerts.storepass`                           | Keytool store password (storepass parameter)                                                                                                                              | `nil`                                                         |
 | `caCertsEnv`                                  | Any environment variable you would like to pass on to the OpenJDK init container. The value is evaluated as a template                                                    | `nil`                                                         |
 | `envVars`                                     | Confluence Server environment variables that will be injected in the ConfigMap. The value is evaluated as a template                                                      | `{}`                                                          |
-| `extraEnv.enabled`                            | Enable additional Confluence Server container environment variables. The value is evaluated as a template                                                                 | `false`                                                       |
-| `extraEnv.parameters`                         | Any extra environment variables you would like to pass on to the Confluence Server. The value is evaluated as a template                                                  | `nil`                                                         |
+| `extraEnv`                                    | Enable additional Confluence Server container environment variables. The value is passed as string                                                                        | `nil`                                                         |
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
