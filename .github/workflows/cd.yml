@@ -1,4 +1,4 @@
-name: check-confluence-version
+name: cd-update-chart-versions
 on:
   schedule:
     - cron: '0 8 */3 * *'
