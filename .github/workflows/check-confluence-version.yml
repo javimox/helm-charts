@@ -1,8 +1,5 @@
 name: check-confluence-version
 on:
-  push:
-    branches:
-      - master
   schedule:
     - cron: '0 8 */3 * *'
 jobs:
