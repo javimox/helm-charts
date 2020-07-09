@@ -2,7 +2,22 @@
 
 [![](https://github.com/javimox/helm-charts/workflows/Release%20Charts/badge.svg?branch=master)](https://github.com/javimox/helm-charts/actions)
 
-## Actions
+Applications ready to be launched on Kubernetes using [Kubernetes Helm](https://github.com/helm/helm).
+
+## TL;DR
+
+```bash
+$ helm repo add mox https://helm.mox.sh
+$ helm search repo mox
+$ helm install my-release mox/<chart>
+```
+
+## About Helm
+
+* [Quick Start guide](https://helm.sh/docs/intro/quickstart/)
+* [Using Helm Guide](https://helm.sh/docs/intro/using_helm/)
+
+## About this repository and its Actions
 
 * [@helm/kind-action](https://github.com/helm/kind-action)
 * [@helm/chart-testing-action](https://github.com/helm/chart-testing-action)
@@ -19,7 +34,7 @@
 
 ## Adding charts to the mox helm repository
 
-* Clone this repository
+* Fork this repository
 * Create a branch off master named after the chart
 * Commit and push origin the new branch
 * Create a Pull Request
