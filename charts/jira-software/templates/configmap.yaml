@@ -18,9 +18,3 @@ data:
   ATL_DB_DRIVER: "{{ .Values.databaseConnection.databaseDriver }}"
   ATL_DB_TYPE: "{{ .Values.databaseConnection.type }}"
   ATL_DB_SCHEMA_NAME: "{{ .Values.databaseConnection.schemaName }}"
-  {{- if .Values.extraEnv.enabled }}
-  JVM_SUPPORT_RECOMMENDED_ARGS: |-
-    {{- range $key, $val := .Values.extraEnv.parameters }}
-    {{ $key }}={{ $val }}
-    {{- end }}
-  {{- end }}
