@@ -1,7 +1,7 @@
 name: check-jira-software-version
 on:
   schedule:
-    - cron: '* * * * *'
+    - cron: '5 8 */3 * *'
 jobs:
   build:
     runs-on: ubuntu-latest
