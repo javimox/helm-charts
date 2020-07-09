@@ -13,7 +13,7 @@ jobs:
         curl -sSO https://my.atlassian.com/download/feeds/confluence.rss
         curl -sSO https://my.atlassian.com/download/feeds/jira-software.rss
     - name: Check Confluence latest version
-      id: getxml
+      id: getxmlconfluence
       uses: moxbot/get-xml-info@1.0
       with:
         xml-file: 'confluence.rss'
@@ -25,7 +25,7 @@ jobs:
         scripts/update_chart_version.sh "confluence-server" "$VERSION"
         rm confluence.rss
     - name: Check Jira latest version
-      id: getxml
+      id: getxmljira
       uses: moxbot/get-xml-info@1.0
       with:
         xml-file: 'jira-software.rss'
