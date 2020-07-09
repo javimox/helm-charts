@@ -12,6 +12,18 @@ $ helm search repo mox
 $ helm install my-release mox/<chart>
 ```
 
+## Chart Sources
+
+* `charts/confluence-server`: Atlassian Confluence Server chart @ [helm.mox.sh](https://mox.sh/helm/charts/confluence-server/)
+* `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
+
+## Adding charts to the mox helm repository
+
+* Fork this repository
+* Create a branch off master named after the chart
+* Commit and push origin the new branch
+* Create a Pull Request
+
 ## About Helm
 
 * [Quick Start guide](https://helm.sh/docs/intro/quickstart/)
@@ -26,18 +38,6 @@ $ helm install my-release mox/<chart>
 ## Project Status
 
 `master` supports Helm 3 only, i. e. both `v1` and `v2` [API version](https://helm.sh/docs/topics/charts/#the-apiversion-field) charts are installable.
-
-## Chart Sources
-
-* `charts/confluence-server`: Atlassian Confluence Server chart @ [helm.mox.sh](https://mox.sh/helm/charts/confluence-server/)
-* `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
-
-## Adding charts to the mox helm repository
-
-* Fork this repository
-* Create a branch off master named after the chart
-* Commit and push origin the new branch
-* Create a Pull Request
 
 ## Results
 
