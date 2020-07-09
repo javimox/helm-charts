@@ -1,0 +1,27 @@
+name: check-jira-software-version
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '5 8 */3 * *'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download RSS
+      run: |
+        curl -sSO https://my.atlassian.com/download/feeds/jira-software.rss
+    - name: Get Version
+      id: getxml
+      uses: moxbot/get-xml-info@1.0
+      with:
+        xml-file: 'jira-software.rss'
+        xpath: '//title[contains(., "Linux")]'
+    - name: Update version
+      env:
+        VERSION: ${{ steps.getxml.outputs.info }}
+      run: |
+        scripts/update_chart_version.sh "jira-software" "$VERSION"
+        rm jira-software.rss
