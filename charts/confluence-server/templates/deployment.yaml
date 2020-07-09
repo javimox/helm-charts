@@ -33,7 +33,7 @@ spec:
             - |
               cp -f ${JAVA_HOME}/lib/security/cacerts /var/atlassian/application-data/confluence/cacerts
               for i in /var/atlassian/application-data/confluence/secrets/cas/* ; do
-                keytool -importcert -file ${f} -alias $(basename ${f}) \
+                keytool -importcert -file ${f} -alias $(basename ${i}) \
                   -keystore /var/atlassian/application-data/confluence/cacerts \
                   -storepass changeit -trustcacerts -noprompt
               done
