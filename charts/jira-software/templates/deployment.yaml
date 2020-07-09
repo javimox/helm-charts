@@ -25,14 +25,18 @@ spec:
       {{- if .Values.caCerts }}
       initContainers:
         - name: ca-certs
-          image: adoptopenjdk/openjdk11:alpine
+          image: adoptopenjdk:11-jdk-hotspot
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh", "-c"]
-          args:
-            - cp -f \"${JAVA_HOME}/lib/security/cacerts\" /var/atlassian/application-data/jira/cacerts;
-              for f in /var/atlassian/application-data/jira/secrets/cas/*;
-              do keytool -importcert -file \"${f}\" -alias \"$(basename \"${f}\")\" -keystore /var/atlassian/application-data/jira/cacerts -storepass {{ .Values.caCerts.storepass | quote }} -trustcacerts -noprompt;
-              done;
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp -f ${JAVA_HOME}/lib/security/cacerts /var/atlassian/application-data/jira/cacerts
+              for i in /var/atlassian/application-data/jira/secrets/cas/* ; do
+                keytool -importcert -file ${i} -alias $(basename ${i}) \
+                  -keystore /var/atlassian/application-data/jira/cacerts \
+                  -storepass changeit -trustcacerts -noprompt
+              done
           volumeMounts:
             - mountPath: /var/atlassian/application-data/jira
               name: {{ include "jira-software.pvcHome" . }}
@@ -64,6 +68,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "jira-software.fullname" . }}-cm
+          env:
+            - name: JVM_SUPPORT_RECOMMENDED_ARGS
+              value: "{{ default "" .Values.extraEnv }}\
+                {{ if .Values.caCerts }} -Djavax.net.ssl.trustStore=/var/atlassian/application-data/jira/cacerts {{ end }}"
           ports:
             - name: http
               containerPort: 8080

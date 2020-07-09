@@ -356,10 +356,4 @@ envVars:
 
 ## JVM_SUPPORT_RECOMMENDED_ARGS
 ## Additional container environment variables
-extraEnv:
-  enabled: false
-  parameters:
-    # -Djavax.net.ssl.trustStore=/var/atlassian/application-data/jira/cacerts
-    # -XX:MaxMetaspaceSize: 512m
-    # -XX:MaxDirectMemorySize: 10m
-    # -Dsynchrony.memory.max: 0m
+# extraEnv: "-XX:MaxMetaspaceSize=512m -XX:MaxDirectMemorySize=10m -Dsynchrony.memory.max=0m"
