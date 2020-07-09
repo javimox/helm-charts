@@ -10,15 +10,28 @@ jobs:
     - name: Download RSS
       run: |
         curl -sSO https://my.atlassian.com/download/feeds/confluence.rss
-    - name: Get Version
+        curl -sSO https://my.atlassian.com/download/feeds/jira-software.rss
+    - name: Check Confluence latest version
       id: getxml
       uses: moxbot/get-xml-info@1.0
       with:
         xml-file: 'confluence.rss'
         xpath: '//title[contains(., "Linux")]'
-    - name: Update version
+    - name: Update Confluence version
       env:
         VERSION: ${{ steps.getxml.outputs.info }}
       run: |
         scripts/update_chart_version.sh "confluence-server" "$VERSION"
         rm confluence.rss
+    - name: Check Jira latest version
+      id: getxml
+      uses: moxbot/get-xml-info@1.0
+      with:
+        xml-file: 'jira-software.rss'
+        xpath: '//title[contains(., "Linux")]'
+    - name: Update version
+      env:
+        VERSION: ${{ steps.getxml.outputs.info }}
+      run: |
+        scripts/update_chart_version.sh "jira-software" "$VERSION"
+        rm jira-software.rss
