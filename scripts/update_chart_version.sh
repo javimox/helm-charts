@@ -59,8 +59,7 @@ if [ "${app_ver}" != "${app_new_ver}" ] ; then
     git config user.name "$git_username"
     git config user.email "$git_email"
     git add ${chart_dir}/{Chart.yaml,values.yaml,values-production.yaml}
-    git commit --signoff -m "[$chart_dir] Release $chart_new_ver: bump to $app_new_ver"
-    git push origin master
+    git commit -a --signoff -m "[$chart_dir] Release $chart_new_ver: bump to $app_new_ver"
 
     # for debugging
     echo "Chart version: $chart_new_ver - $app version: $app_new_ver"
