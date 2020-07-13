@@ -1,20 +1,22 @@
 name: Release Charts
 
 on:
-  push:
+  pull_request:
     branches:
-      - master
+    - master
+    types: [closed]
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[ci skip]') && github.event.pull_request.merged == true"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Fetch history
-        run: git fetch --prune --unshallow
+      - name: Fetch history and commit message
+        run: |
+          git fetch --prune --unshallow
+          echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
 
       - name: Configure Git
         run: |
@@ -33,6 +35,7 @@ jobs:
           helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
       - name: Run chart-releaser
+        if: "contains( env.commitmsg, 'Release' )"
         uses: moxbot/chart-releaser-action@v1.0.0-rc.2
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
