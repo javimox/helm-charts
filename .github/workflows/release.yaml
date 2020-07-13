@@ -35,7 +35,7 @@ jobs:
           helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
       - name: Run chart-releaser
-        if: "contains( env.commitmsg, 'Release' )"
+        if: "github.event.pull_request.merged == true && contains( env.commitmsg, 'Release' )"
         uses: moxbot/chart-releaser-action@v1.0.0-rc.2
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
