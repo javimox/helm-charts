@@ -40,10 +40,10 @@ jobs:
       uses: moxbot/create-pull-request@v2
       with:
         token: ${{ secrets.CR_TOKEN }}
-        commit-message: '[Release] update Charts with the latest stable App versions
+        commit-message: "[Release] update Charts with the latest stable App versions"
         committer: moxbot <bot@mox.sh>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-        title: '[Release] latest stable Apps versions'
+        title: "[Release] latest stable Apps versions"
         body: |
           New versions of the Apps have been released, and the Charts have been updated.
           - PR auto-generated in the repo: [helm-charts][1]
