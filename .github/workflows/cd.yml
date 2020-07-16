@@ -35,6 +35,19 @@ jobs:
       run: |
         scripts/update_chart_version.sh "jira-software" "$JIRA_SOFTWARE_VERSION"
         rm jira-software.rss
-    - uses: moxbot/github-push-action@master
+    - name: Create Pull Request
+      id: cpr
+      uses: moxbot/create-pull-request@v2
       with:
-        github_token: ${{ secrets.CR_TOKEN }}
+        token: ${{ secrets.CR_TOKEN }}
+        commit-message: '[Release] update Charts with the latest stable App versions
+        committer: moxbot <bot@mox.sh>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        title: '[Release] latest stable Apps versions'
+        body: |
+          New versions of the Apps have been released, and the Charts have been updated.
+          - PR auto-generated in the repo: [helm-charts][1]
+
+           [1]: https://github.com/javimox/helm-charts
+        branch: latest-stable-versions
+        labels: update-appVersion
