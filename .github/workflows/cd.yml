@@ -1,7 +1,7 @@
 name: Latest Stable Versions
 on:
   schedule:
-    - cron: '* * * * *'
+    - cron: '0 8 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
