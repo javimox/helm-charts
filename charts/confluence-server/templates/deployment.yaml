@@ -76,6 +76,9 @@ spec:
             - name: http
               containerPort: 8090
               protocol: TCP
+            - name: synchrony
+              containerPort: 8091
+              protocol: TCP
           {{- if .Values.readinessProbe }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}

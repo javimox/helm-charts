@@ -316,6 +316,8 @@ envVars:
   #
   ## Tomcat and Reverse Proxy Settings
   ## Jira running behind a reverse proxy server options
+  ## Note - When ingress is enabled:
+  ## These values are set automatically. Do not uncomment these proxy settings.
   # ATL_PROXY_NAME: ""
   # ATL_PROXY_PORT: ""
   # ATL_TOMCAT_PORT: 8080
