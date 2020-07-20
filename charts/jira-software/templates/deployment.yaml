@@ -6,10 +6,8 @@ metadata:
     {{- include "jira-software.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  {{- with .Values.updateStrategy }}
   strategy:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    type: Recreate
   selector:
     matchLabels:
       {{- include "jira-software.selectorLabels" . | nindent 6 }}
