@@ -6,10 +6,8 @@ metadata:
     {{- include "confluence-server.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
-  {{- with .Values.updateStrategy }}
   strategy:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    type: Recreate
   selector:
     matchLabels:
       {{- include "confluence-server.selectorLabels" . | nindent 6 }}
