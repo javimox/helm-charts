@@ -176,16 +176,6 @@ extraVolumes: []
   #     - key: ca-cert
   #       path: ca_cert
 
-## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
-## Change double-quoted values if enabled is set to 'true'
-vaultSecrets:
-  enabled: false
-  secret: ""
-  host: &host "${myvault.secrets.confluence-server-db-host}"
-  db: &db "${myvault.secrets.confluence-server-db}"
-  user: &db-user "${myvault.secrets.confluence-server-db-user}"
-  pw: &db-pw "${myvault.secrets.confluence-server-db-pw}"
-
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 schedulerName: ""
@@ -236,26 +226,19 @@ postgresql:
 
 ##
 ## If postgresql is enabled and no database exists, it will be created (see db-helper ConfigMap)
-## by default, vaultSecret* are mapped here
-## If vaultSecrets.enabled is false, replace values below in plaintext,
 ## password will be send to externaldb-secrets
 ##
-## Aliases disabled, not using vaultSecrets anchors.
 databaseConnection:
   ## Database host
-  # host: *host
   host: confluence-server-db
 
   ## non-root Username for Confluence Database
-  # user: *db-user
   user: confluenceuser
 
-  ## Database password
-  # password: *db-pw
-  password: ""
+  ## Database password. CHANGE IT :)
+  password: "CHANGEME"
 
   ## Database name
-  # database: *db
   database: confluencedb
 
   ## lc_collate and lc_ctype, only in case database needs to be created

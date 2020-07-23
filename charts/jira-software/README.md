@@ -142,12 +142,6 @@ The following tables lists the configurable parameters of the Jira Software char
 | `persistence.storageClass`                    | PVC Storage Class for Jira Software volume                                                                                                                                | `empty` (uses alpha storage annotation)                       |
 | `extraVolumeMounts`                           | Additional volume mounts to add to the pods                                                                                                                               | `[]`                                                          |
 | `extraVolumes`                                | Additional volumes to add to the pods                                                                                                                                     | `[]`                                                          |
-| `vaultSecrets.enabled`                        | Enable pulling secrets for the database connection from Vault                                                                                                             | `false`                                                       |
-| `vaultSecrets.secret`                         | Vault secret name                                                                                                                                                         | `""`                                                          |
-| `vaultSecrets.host`                           | Vault secret Hostname of the database server (Note: anchor used by `databaseConnection.host`)                                                                             | &host `""`                                                    |
-| `vaultSecrets.db`                             | Vault secret Jira database name (Note: anchor used by `databaseConnection.database`)                                                                                      | &db `""`                                                      |
-| `vaultSecrets.user`                           | Vault secret Jira database user (Note: anchor used by `databaseConnection.user`)                                                                                          | &db-user `""`                                                 |
-| `vaultSecrets.pw`                             | Vault secret Jira database password (Note: anchor used by `databaseConnection.password`)                                                                                  | &db-pw `""`                                                   |
 | `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                                                                   | `""`                                                          |
 | `readinessProbe`                              | Readiness probe values                                                                                                                                                    | `{}`                                                          |
 | `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Jira handler is `/status`)                                                                                                        | `nil`                                                         |
@@ -171,10 +165,10 @@ The following tables lists the configurable parameters of the Jira Software char
 | `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                                                                                                       | `jira-software-db`                                            |
 | `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                                                                                                 | `8Gi`                                                         |
 | `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts). The value is evaluated as a template.                                                                  | `{{ .Release.Name }}-db-helper-cm`                            |
-| `databaseConnection.host`                     | Hostname of the database server (Note: values-production uses the anchor of `vaultSecrets.host`.                                                                          | `jira-software-db`                                            |
-| `databaseConnection.user`                     | Jira database user (Note: values-production uses the anchor of `vaultSecrets.user`)                                                                                       | `jirauser`                                                    |
-| `databaseConnection.password`                 | Jira database password (Note: values-production uses the anchor of `vaultSecrets.pw`)                                                                                     | `""`                                                          |
-| `databaseConnection.database`                 | Jira database name (Note: values-production uses the anchor of `vaultSecrets.db`)                                                                                         | `jiradb`                                                      |
+| `databaseConnection.host`                     | Hostname of the database server                                                                                                                                           | `jira-software-db`                                            |
+| `databaseConnection.user`                     | Jira database user                                                                                                                                                        | `jirauser`                                                    |
+| `databaseConnection.password`                 | Jira database password                                                                                                                                                    | `"CHANGEME"`                                                  |
+| `databaseConnection.database`                 | Jira database name                                                                                                                                                        | `jiradb`                                                      |
 | `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created (See: `postgresql.initdbScriptsConfigMap`)                                             | `C`                                                           |
 | `databaseConnection.port`                     | Jira database server port                                                                                                                                                 | `5432`                                                        |
 | `databaseConnection.urlPrefix`                | Jira JDBC Prefix URL                                                                                                                                                      | `jdbc:postgresql`                                             |
@@ -222,28 +216,13 @@ It is possible to remove an existing Jira database while deploying. Useful if, e
 
 If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `yes`, then removes the database specified on `databaseConnection.database`, if it exists.
 
+## Diff values and values-production
+
+Version 0.3.2
 ```console
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
-@@ -46,19 +46,19 @@
- ## Security context
- ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
- securityContext: {}
--#  capabilities:
--#    drop:
--#    - ALL
--#  readOnlyRootFilesystem: true
--#  runAsNonRoot: true
--#  runAsUser: 1000
-+  # capabilities:
-+  #   drop:
-+  #   - ALL
-+  # readOnlyRootFilesystem: true
-+  # runAsNonRoot: true
-+  # runAsUser: 1000
- 
- ## Service/Networking
- ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+@@ -58,7 +58,7 @@
  ## Kubernetes svc configuration
  service:
    ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -266,18 +245,7 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -162,8 +162,8 @@
- ## Pull secrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
- ## Change double-quoted values if enabled is set to 'true'
- vaultSecrets:
--  enabled: false
--  secret: ""
-+  enabled: true
-+  secret: "mysecret-jira-software"
-   host: &host "${myvault.secrets.jira-software-db-host}"
-   db: &db "${myvault.secrets.jira-software-db}"
-   user: &db-user "${myvault.secrets.jira-software-db-user}"
-@@ -222,7 +222,7 @@
+@@ -202,7 +202,7 @@
    fullnameOverride: jira-software-db
  
    persistence:
@@ -286,38 +254,7 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
  
    initdbScriptsConfigMap: |-
      {{ .Release.Name }}-db-helper-cm
-@@ -236,20 +236,20 @@
- ## Aliases disabled, not using vaultSecrets anchors.
- databaseConnection:
-   ## Database host
--  # host: *host
--  host: jira-software-db
-+  # host: jira-software-db
-+  host: *host
- 
-   ## non-root Username for Jira Database
--  # user: *db-user
--  user: jirauser
--
-+  # user: jirauser
-+  user: *db-user
-+  
-   ## Database password
--  # password: *db-pw
--  password: ""
--
-+  # password: ""
-+  password: *db-pw
-+  
-   ## Database name
--  # database: *db
--  database: jiradb
-+  # database: jiradb
-+  database: *db
- 
-   ## lc_collate and lc_ctype, only in case database needs to be created
-   lang: C
-@@ -303,14 +303,14 @@
+@@ -276,14 +276,14 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
