@@ -159,16 +159,6 @@ extraVolumes: []
   #     - key: ca-cert
   #       path: ca_cert
 
-## Pull secrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
-## Change double-quoted values if enabled is set to 'true'
-vaultSecrets:
-  enabled: true
-  secret: "mysecret-jira-software"
-  host: &host "${myvault.secrets.jira-software-db-host}"
-  db: &db "${myvault.secrets.jira-software-db}"
-  user: &db-user "${myvault.secrets.jira-software-db-user}"
-  pw: &db-pw "${myvault.secrets.jira-software-db-pw}"
-
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 schedulerName: ""
@@ -219,27 +209,20 @@ postgresql:
 
 ##
 ## If postgresql is enabled and no database exists, it will be created (see db-helper ConfigMap)
-## by default, vaultSecret* are mapped here
-## If vaultSecrets.enabled is false, replace values below in plaintext,
 ## password will be send to externaldb-secrets
 ##
-## Aliases disabled, not using vaultSecrets anchors.
 databaseConnection:
   ## Database host
-  # host: jira-software-db
-  host: *host
+  host: jira-software-db
 
   ## non-root Username for Jira Database
-  # user: jirauser
-  user: *db-user
+  user: jirauser
   
-  ## Database password
-  # password: ""
-  password: *db-pw
+  ## Database password. CHANGE IT :)
+  password: "CHANGEME"
   
   ## Database name
   # database: jiradb
-  database: *db
 
   ## lc_collate and lc_ctype, only in case database needs to be created
   lang: C
