@@ -147,12 +147,6 @@ The following tables lists the configurable parameters of the Confluence Server 
 | `mountAttachments.storageClass`               | PVC Storage Class for Confluence Server Attachments volume                                                                                                                | `empty` (uses alpha storage annotation)                       |
 | `extraVolumeMounts`                           | Additional volume mounts to add to the pods                                                                                                                               | `[]`                                                          |
 | `extraVolumes`                                | Additional volumes to add to the pods                                                                                                                                     | `[]`                                                          |
-| `vaultSecrets.enabled`                        | Enable pulling secrets for the database connection from Vault                                                                                                             | `false`                                                       |
-| `vaultSecrets.secret`                         | Vault secret name                                                                                                                                                         | `""`                                                          |
-| `vaultSecrets.host`                           | Vault secret Hostname of the database server (Note: anchor used by `databaseConnection.host`)                                                                             | &host `""`                                                    |
-| `vaultSecrets.db`                             | Vault secret Confluence database name (Note: anchor used by `databaseConnection.database`)                                                                                | &db `""`                                                      |
-| `vaultSecrets.user`                           | Vault secret Confluence database user (Note: anchor used by `databaseConnection.user`)                                                                                    | &db-user `""`                                                 |
-| `vaultSecrets.pw`                             | Vault secret Confluence database password (Note: anchor used by `databaseConnection.password`)                                                                            | &db-pw `""`                                                   |
 | `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                                                                   | `""`                                                          |
 | `readinessProbe`                              | Readiness probe values                                                                                                                                                    | `{}`                                                          |
 | `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Confluence handler is `/status`)                                                                                                  | `nil`                                                         |
@@ -176,10 +170,10 @@ The following tables lists the configurable parameters of the Confluence Server 
 | `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                                                                                                       | `confluence-server-db`                                        |
 | `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                                                                                                 | `nil`                                                         |
 | `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts). The value is evaluated as a template.                                                                  | `{{ .Release.Name }}-db-helper-cm`                            |
-| `databaseConnection.host`                     | Hostname of the database server (Note: values-production uses the anchor of `vaultSecrets.host`.                                                                          | `confluence-server-db`                                        |
-| `databaseConnection.user`                     | Confluence database user (Note: values-production uses the anchor of `vaultSecrets.user`)                                                                                 | `confluence-user`                                             |
-| `databaseConnection.password`                 | Confluence database password (Note: values-production uses the anchor of `vaultSecrets.pw`)                                                                               | `""`                                                          |
-| `databaseConnection.database`                 | Confluence database name (Note: values-production uses the anchor of `vaultSecrets.db`)                                                                                   | `confluence-db`                                               |
+| `databaseConnection.host`                     | Hostname of the database server                                                                                                                                           | `jira-software-db`                                            |
+| `databaseConnection.user`                     | Jira database user                                                                                                                                                        | `jirauser`                                                    |
+| `databaseConnection.password`                 | Jira database password                                                                                                                                                    | `"CHANGEME"`                                                  |
+| `databaseConnection.database`                 | Jira database name                                                                                                                                                        | `jiradb`                                                      |
 | `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created (See: `postgresql.initdbScriptsConfigMap`)                                             | `C`                                                           |
 | `databaseConnection.port`                     | Confluence database server port                                                                                                                                           | `5432`                                                        |
 | `databaseConnection.type`                     | Confluence database server type                                                                                                                                           | `postgresql`                                                  |
@@ -230,6 +224,7 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
+Chart Version 0.3.2
 ```console
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
@@ -270,18 +265,7 @@ $ helm upgrade --install my-release \
  
    ## If defined, storageClassName: <storageClass>
    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-@@ -179,8 +179,8 @@
- ## Pull ecrets for the DB connection from Vault  (here we use anchors, see databaseConnection)
- ## Change double-quoted values if enabled is set to 'true'
- vaultSecrets:
--  enabled: false
--  secret: ""
-+  enabled: true
-+  secret: "mysecret-confluence-server"
-   host: &host "${myvault.secrets.confluence-server-db-host}"
-   db: &db "${myvault.secrets.confluence-server-db}"
-   user: &db-user "${myvault.secrets.confluence-server-db-user}"
-@@ -238,8 +238,8 @@
+@@ -218,8 +218,8 @@
  
    fullnameOverride: confluence-server-db
  
@@ -292,40 +276,7 @@ $ helm upgrade --install my-release \
  
    initdbScriptsConfigMap: |-
      {{ .Release.Name }}-db-helper-cm
-@@ -250,23 +250,23 @@
- ## If vaultSecrets.enabled is false, replace values below in plaintext,
- ## password will be send to externaldb-secrets
- ##
--## Aliases disabled, not using vaultSecrets anchors.
-+## Aliases enabled, using vaultSecrets anchors.
- databaseConnection:
-   ## Database host
--  # host: *host
--  host: confluence-server-db
-+  # host: confluence-server-db
-+  host: *host
- 
-   ## non-root Username for Confluence Database
--  # user: *db-user
--  user: confluenceuser
-+  # user: confluenceuser
-+  user: *db-user
- 
-   ## Database password
--  # password: *db-pw
--  password: ""
-+  # password: ""
-+  password: *db-pw
- 
-   ## Database name
--  # database: *db
--  database: confluencedb
-+  # database: confluencedb
-+  database: *db
- 
-   ## lc_collate and lc_ctype, only in case database needs to be created
-   lang: C
-@@ -299,13 +299,13 @@
+@@ -272,13 +272,13 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
