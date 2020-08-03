@@ -1,0 +1,52 @@
+name: Update mox blog
+
+on:
+  release:
+    types: [published]
+
+env:
+  TAG: ${{ github.event.release.tag_name }}
+  CHART: "${TAG%-*}" # remove version
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    steps:
+    # this helm repository
+    - name: Checkout helm repo
+      uses: actions/checkout@v2
+
+    # website
+    - name: Checkout website repo
+      uses: actions/checkout@v2
+      with:
+        repository: javimox/javimox.github.io
+        path: website
+
+    - name: Update last modified date
+      run: |
+        /bin/cat website/_drafts/helm/front-matter-${CHART}.md > website/_pages/helm/${CHART}.md
+        last_modified=$(TZ=":Europe/Berlin" /bin/date +%Y-%m-%dT%H:%M:%S+02:00 -d "$(/usr/bin/stat -c %x website/_pages/helm/${CHART}.md)")
+        /bin/sed -i -e "0,/^last_modified_at:/ s/^last_modified_at:.*/last_modified_at: $last_modified/" website/_pages/helm/${CHART}.md
+
+    - name: Update blog entry
+      run: |
+        /bin/cat charts/${CHART}/README.md >> website/_pages/helm/${CHART}.md
+
+    - name: Create PR
+      id: cpr
+      uses: moxbot/create-pull-request@v2
+      with:
+        token: ${{ secrets.WWW_PAT }}
+        path: "website/"
+        commit-message: "[Release] New chart version: ${{ env.TAG }}"
+        committer: moxbot <bot@mox.sh>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        title: "[Release] New chart version: ${{ env.TAG }}"
+        body: |
+          New Chart version has been released. Updating Charts section of the web.
+          - PR auto-generated in the repo: [mox.sh][1]
+
+           [1]: https://github.com/javimox/javimox.github.io
+        branch: update-helm-section
+        labels: update-charts-readme
