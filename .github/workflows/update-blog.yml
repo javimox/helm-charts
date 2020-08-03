@@ -4,10 +4,6 @@ on:
   release:
     types: [published]
 
-env:
-  TAG: ${{ github.event.release.tag_name }}
-  CHART: "${TAG%-*}" # remove version
-
 jobs:
   update-content:
     runs-on: ubuntu-latest
@@ -23,14 +19,13 @@ jobs:
         repository: javimox/javimox.github.io
         path: website
 
-    - name: Update last modified date
+    - name: Update blog entry
       run: |
+        TAG=${{ github.event.release.tag_name }}
+        CHART="${TAG%-*}"
         /bin/cat website/_drafts/helm/front-matter-${CHART}.md > website/_pages/helm/${CHART}.md
         last_modified=$(TZ=":Europe/Berlin" /bin/date +%Y-%m-%dT%H:%M:%S+02:00 -d "$(/usr/bin/stat -c %x website/_pages/helm/${CHART}.md)")
         /bin/sed -i -e "0,/^last_modified_at:/ s/^last_modified_at:.*/last_modified_at: $last_modified/" website/_pages/helm/${CHART}.md
-
-    - name: Update blog entry
-      run: |
         /bin/cat charts/${CHART}/README.md >> website/_pages/helm/${CHART}.md
 
     - name: Create PR
@@ -39,10 +34,10 @@ jobs:
       with:
         token: ${{ secrets.WWW_PAT }}
         path: "website/"
-        commit-message: "[Release] New chart version: ${{ env.TAG }}"
+        commit-message: "[Release] New chart version: ${{ github.event.release.tag_name }}"
         committer: moxbot <bot@mox.sh>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-        title: "[Release] New chart version: ${{ env.TAG }}"
+        title: "[Release] New chart version: ${{ github.event.release.tag_name }}"
         body: |
           New Chart version has been released. Updating Charts section of the web.
           - PR auto-generated in the repo: [mox.sh][1]
