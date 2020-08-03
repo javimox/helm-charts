@@ -31,7 +31,7 @@ jobs:
 
       - name: Add dependency chart repos
         run: |
-          helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+          helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Run chart-releaser
         uses: moxbot/chart-releaser-action@v1.0.0-rc.2

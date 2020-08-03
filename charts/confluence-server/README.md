@@ -1,4 +1,4 @@
-# Atlassian Confluence Server
+## Atlassian Confluence Server
 
 [Confluence](https://www.atlassian.com/software/confluence) is a collaboration software program developed and published by the australian software company **Atlassian**.
 
@@ -17,9 +17,10 @@ $ helm install my-release mox/confluence-server
 This chart bootstraps a [Confluence server](https://hub.docker.com/r/atlassian/confluence-server/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 It is available on:
- * https://helm.mox.sh
- * https://hub.helm.sh/charts/mox/confluence-server
- * https://artifacthub.io/package/chart/mox/confluence-server
+ * [helm.mox.sh](https://helm.mox.sh)
+ * [hub.helm.sh](https://hub.helm.sh/charts/mox/confluence-server)
+ * [artifacthub.io](https://artifacthub.io/packages/helm/mox/confluence-server)
+ * [hub.kubeapps.com](https://hub.kubeapps.com/charts/mox/confluence-server)
 
 ## Prerequisites
 
@@ -170,10 +171,10 @@ The following tables lists the configurable parameters of the Confluence Server 
 | `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                                                                                                       | `confluence-server-db`                                        |
 | `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                                                                                                 | `nil`                                                         |
 | `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts). The value is evaluated as a template.                                                                  | `{{ .Release.Name }}-db-helper-cm`                            |
-| `databaseConnection.host`                     | Hostname of the database server                                                                                                                                           | `jira-software-db`                                            |
-| `databaseConnection.user`                     | Jira database user                                                                                                                                                        | `jirauser`                                                    |
+| `databaseConnection.host`                     | Hostname of the database server                                                                                                                                           | `confluence-server-db`                                        |
+| `databaseConnection.user`                     | Jira database user                                                                                                                                                        | `confluenceuser`                                              |
 | `databaseConnection.password`                 | Jira database password                                                                                                                                                    | `"CHANGEME"`                                                  |
-| `databaseConnection.database`                 | Jira database name                                                                                                                                                        | `jiradb`                                                      |
+| `databaseConnection.database`                 | Jira database name                                                                                                                                                        | `confluencedb`                                                |
 | `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created (See: `postgresql.initdbScriptsConfigMap`)                                             | `C`                                                           |
 | `databaseConnection.port`                     | Confluence database server port                                                                                                                                           | `5432`                                                        |
 | `databaseConnection.type`                     | Confluence database server type                                                                                                                                           | `postgresql`                                                  |
@@ -224,7 +225,7 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 0.3.2
+Chart Version 0.3.4
 ```console
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
