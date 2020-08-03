@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+env:
+  TAG: ${{ github.event.release.tag_name }}
+
 jobs:
   update-content:
     runs-on: ubuntu-latest
@@ -21,7 +24,6 @@ jobs:
 
     - name: Update blog entry
       run: |
-        TAG=${{ github.event.release.tag_name }}
         CHART="${TAG%-*}"
         /bin/cat website/_drafts/helm/front-matter-${CHART}.md > website/_pages/helm/${CHART}.md
         last_modified=$(TZ=":Europe/Berlin" /bin/date +%Y-%m-%dT%H:%M:%S+02:00 -d "$(/usr/bin/stat -c %x website/_pages/helm/${CHART}.md)")
@@ -34,10 +36,10 @@ jobs:
       with:
         token: ${{ secrets.WWW_PAT }}
         path: "website/"
-        commit-message: "[Release] New chart version: ${{ github.event.release.tag_name }}"
+        commit-message: "[Release] New chart version: ${{ env.TAG }}"
         committer: moxbot <bot@mox.sh>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-        title: "[Release] New chart version: ${{ github.event.release.tag_name }}"
+        title: "[Release] New chart version: ${{ env.TAG }}"
         body: |
           New Chart version has been released. Updating Charts section of the web.
           - PR auto-generated in the repo: [mox.sh][1]
