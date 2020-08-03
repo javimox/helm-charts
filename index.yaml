@@ -3,6 +3,39 @@ entries:
   confluence-server:
   - apiVersion: v2
     appVersion: 7.6.2
+    created: "2020-08-03T00:57:02.119539705Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Wiki collaboration platform
+    digest: 170b95462e9b708a1ec65316893ad334d265000db38308dac5f1e6006dc74a0e
+    home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+    icon: https://mox.sh/assets/images/confluence-logo.png
+    keywords:
+    - wiki
+    - confluence
+    - confluence-server
+    - atlassian
+    - documentation
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: confluence-server
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/confluence-server
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/confluence-server-0.3.4/confluence-server-0.3.4.tgz
+    version: 0.3.4
+  - apiVersion: v2
+    appVersion: 7.6.2
     created: "2020-07-28T08:02:27.901312496Z"
     dependencies:
     - condition: postgresql.enabled
@@ -530,6 +563,39 @@ entries:
     - https://github.com/javimox/helm-charts/releases/download/confluence-server-0.1.1/confluence-server-0.1.1.tgz
     version: 0.1.1
   jira-software:
+  - apiVersion: v2
+    appVersion: 8.11.0
+    created: "2020-08-03T00:57:02.224079923Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Issue tracker and agile project management platform
+    digest: dd348e291bd2a9c0d94e3b915e359a6a36575c70f1f100d613022d0b091b87f7
+    home: https://hub.docker.com/r/atlassian/jira-software
+    icon: https://mox.sh/assets/images/jira-logo.png
+    keywords:
+    - jira
+    - agile
+    - project management
+    - issue tracking
+    - bug tracking
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: jira-software
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/jira-software
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/jira-software-0.3.4/jira-software-0.3.4.tgz
+    version: 0.3.4
   - apiVersion: v2
     appVersion: 8.11.0
     created: "2020-07-23T14:10:50.474568443Z"
