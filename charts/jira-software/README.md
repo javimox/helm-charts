@@ -1,4 +1,4 @@
-# Atlassian Jira Software
+## Atlassian Jira Software
 
 [Jira](https://www.atlassian.com/software/jira) is a tool used for bug tracking, issue tracking, and project management. It is developed and published by the australian software company **Atlassian**.
 
@@ -17,9 +17,10 @@ $ helm install my-release mox/jira-software
 This chart bootstraps a [Jira Software](https://hub.docker.com/r/atlassian/jira-software/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 It is available on:
- * https://helm.mox.sh
- * https://hub.helm.sh/charts/mox/jira-software
- * https://artifacthub.io/package/chart/mox/jira-software
+ * [helm.mox.sh](https://helm.mox.sh)
+ * [hub.helm.sh](https://hub.helm.sh/charts/mox/jira-software)
+ * [artifacthub.io](https://artifacthub.io/packages/helm/mox/jira-software)
+ * [hub.kubeapps.com](https://hub.kubeapps.com/charts/mox/jira-software)
 
 ## Prerequisites
 
@@ -181,7 +182,7 @@ The following tables lists the configurable parameters of the Jira Software char
 | `caCerts.storepass`                           | Keytool store password (storepass parameter)                                                                                                                              | `nil`                                                         |
 | `caCertsEnv`                                  | Any environment variable you would like to pass on to the OpenJDK init container. The value is evaluated as a template                                                    | `nil`                                                         |
 | `envVars`                                     | Jira Software environment variables that will be injected in the ConfigMap. The value is evaluated as a template                                                          | `{}`                                                          |
-| `extraEnv`                                    | Enable additional Confluence Server container environment variables. The value is passed as string                                                                        | `nil`                                                         | 
+| `extraEnv`                                    | Enable additional Jira container environment variables. The value is passed as string                                                                                     | `nil`                                                         | 
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
@@ -216,9 +217,9 @@ It is possible to remove an existing Jira database while deploying. Useful if, e
 
 If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `yes`, then removes the database specified on `databaseConnection.database`, if it exists.
 
-## Diff values and values-production
+## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Version 0.3.2
+Version 0.3.4
 ```console
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
