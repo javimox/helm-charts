@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "crowd.fullname" . }}
+  labels:
+    {{- include "crowd.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "crowd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "crowd.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- . | toYaml | trim | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if .Values.caCerts }}
+      initContainers:
+        - name: ca-certs
+          image: adoptopenjdk:11-jdk-hotspot
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp -f ${JAVA_HOME}/lib/security/cacerts /var/atlassian/application-data/crowd/cacerts
+              for i in /var/atlassian/application-data/crowd/secrets/cas/* ; do
+                keytool -importcert -file ${i} -alias $(basename ${i}) \
+                  -keystore /var/atlassian/application-data/crowd/cacerts \
+                  -storepass changeit -trustcacerts -noprompt
+              done
+          volumeMounts:
+            - mountPath: /var/atlassian/application-data/crowd
+              name: {{ include "crowd.pvcHome" . }}
+            - mountPath: /var/atlassian/application-data/crowd/secrets/cas
+              name: crowd-cas
+          {{- with .Values.caCertsEnv }}
+          env:
+            {{- . | toYaml | trim | nindent 12 }}
+          {{- end }}
+      {{- end }}
+    {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName | quote }}
+      {{- end }}
+      serviceAccountName: {{ include "crowd.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- if .Values.securityContext }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "crowd.fullname" . }}-cm
+          env:
+            - name: JVM_SUPPORT_RECOMMENDED_ARGS
+              value: "{{ default "" .Values.extraEnv }}\
+                {{ if .Values.caCerts }} -Djavax.net.ssl.trustStore=/var/atlassian/application-data/crowd/cacerts {{ end }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- if .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /var/atlassian/application-data/crowd
+              name: {{ include "crowd.pvcHome" . }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "crowd.tplValue" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: {{ include "crowd.pvcHome" . }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "crowd.pvcHome" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.caCerts }}
+        - name: crowd-cas
+          secret:
+            secretName: {{ .Values.caCerts.secret }}
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "crowd.tplValue" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

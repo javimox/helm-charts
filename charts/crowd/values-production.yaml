@@ -1,0 +1,292 @@
+# Default values for wiki.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# @Notes
+# We must set resources requests and limits for preventing OOM killer
+
+## Atlassian Crowd image version
+## ref: https://hub.docker.com/r/atlassian/crowd
+image:
+  # registry: hub.docker.com
+  repository: atlassian/crowd
+  tag: 4.1.0
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  pullSecrets: {}
+  #   - myRegistryKeySecretName
+
+## String to partially override wiki.fullname template (will maintain the release name)
+nameOverride: ""
+
+## String to fully override wiki.fullname template
+fullnameOverride: ""
+
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#podsecuritycontext-v1-core
+podSecurityContext:
+  fsGroup: 2004
+
+## Security context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Service/Networking
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+## Kubernetes svc configuration
+service:
+  ## For minikube, set this to NodePort, elsewhere use LoadBalancer
+  type: ClusterIP
+  ## The port for Tomcat/Crowd to listen on
+  port: 8095
+  ## HTTPS Port, in case ATL_TOMCAT_SCHEME is set to 'https'
+  httpsPort:
+  loadBalancerIP:
+  ## Use nodePorts to requets some specific ports when usin NodePort
+  ## nodePorts:
+  ##   http: <to set explicitly, choose port between 30000-32767>
+  ##   https: <to set explicitly, choose port between 30000-32767>
+  ##
+  nodePorts:
+    http:
+    https:
+
+## Configure the ingress resource that allows you to access the
+## Crowd installation. Set up the URL
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+ingress:
+  ## Set to true to enable ingress record generation
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: crowd.local
+      paths: []
+  tls: []
+  #  - secretName: crowd.local-tls
+  #    hosts:
+  #      - crowd.local
+
+## Resources. Mandatory, see @Notes above.
+## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests:
+    memory: 1Gi
+    cpu: 500m
+#  limits:
+#    memory: 1Gi
+
+## Replication (without ReplicaSet)
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+replicaCount: 1
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+## Pod annotations
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+
+## Persistent Volume Claim
+## Crowd Home directory
+## https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+persistence:
+  enabled: true
+  annotations: {}
+  ## existingClaim needs the existing PVC name
+  existingClaim: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to nil, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass:
+
+# Additional volume mounts
+extraVolumeMounts: []
+  ## Example: Mount CA file
+  # - name: ca-cert
+  #   subPath: ca_cert
+  #   mountPath: /path/to/ca_cert
+
+# Additional volumes
+extraVolumes: []
+  ## Example: Add secret volume
+  # - name: ca-cert
+  #   secret:
+  #     secretName: ca-cert
+  #     items:
+  #     - key: ca-cert
+  #       path: ca_cert
+
+## Use an alternate scheduler, e.g. "stork".
+## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+schedulerName: ""
+
+## Container Probes
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+## Depending what values we give, Crowd won't be reachable. In doubt, leave it as it is.
+readinessProbe: {}
+#  httpGet:
+#    path: /status
+#    port: http
+#  initialDelaySeconds: 300
+#  periodSeconds: 30
+#  failureThreshold: 6
+#  timeoutSeconds: 10
+
+livenessProbe: {}
+#  httpGet:
+#    path: /status
+#    port: http
+#  initialDelaySeconds: 480
+#  periodSeconds: 30
+#  failureThreshold: 6
+#  timeoutSeconds: 10
+
+##
+## Postgresql chart configuration
+## https://github.com/helm/charts/blob/master/stable/postgresql/values.yaml
+##
+postgresql:
+  ## Whether to deploy a postgres server to satisfy the applications database requirements.
+  enabled: true
+
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: "11"
+    pullPolicy: IfNotPresent
+
+  fullnameOverride: crowd-db
+
+  persistence:
+    size: 8Gi
+
+  initdbScriptsConfigMap: |-
+    {{ .Release.Name }}-db-helper-cm
+
+##
+## If postgresql is enabled and no database exists, it will be created (see db-helper ConfigMap)
+## password will be send to externaldb-secrets
+##
+databaseConnection:
+  ## Database host
+  host: crowd-db
+
+  ## non-root Username for Crowd Database
+  user: crowduser
+
+  ## Database password. CHANGE IT :)
+  password: "CHANGEME"
+
+  ## Database name
+  database: crowddb
+
+  ## lc_collate and lc_ctype, only in case database needs to be created
+  lang: C
+
+  ## Database port number
+  port: 5432
+
+  ## Database Type
+  type: postgresql
+
+## DB DROP, use with caution!
+## If postgresql.enabled is set to true and database exists, it will drop the db before creating a new one
+## (see db-helper ConfigMap)
+## This shouldn't be changed manually, instead run helm with --set databaseDrop.enabled=true --set databaseDrop.dropIt="yes"
+## to be sure that you know what you are doing
+databaseDrop:
+  enabled: false
+  dropIt: "no"
+
+##
+## Crowd specific configurations
+## https://hub.docker.com/r/atlassian/crowd
+## crowd/secrets/cas
+caCerts: {}
+  # secret: my-secret
+  # storepass: my-store-password
+# caCertsEnv:
+#   - name: VARIABLE
+#     value: my-value
+#
+## Environment Variables that will be injected in the ConfigMap
+## Default values unless otherwise stated
+envVars:
+  ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
+  JVM_MINIMUM_MEMORY: 1024m
+  ## Memory / Heap Size (JVM_MAXIMUM_MEMORY) Mandatory, see @Notes above
+  JVM_MAXIMUM_MEMORY: 1024m
+  #
+  ## Tomcat and Reverse Proxy Settings
+  ## Crowd running behind a reverse proxy server options
+  ## Note - When ingress is enabled:
+  ## These values are set automatically. Do not uncomment these proxy settings.
+  # ATL_PROXY_NAME: ""
+  # ATL_PROXY_PORT: ""
+  # ATL_TOMCAT_SCHEME: http
+  # ATL_TOMCAT_SECURE: false
+  # ATL_TOMCAT_CONTEXTPATH: ""
+  #
+  ## Tomcat/Catalina options
+  ## ref: https://tomcat.apache.org/tomcat-7.0-doc/config/index.html
+  # ATL_TOMCAT_MGMT_PORT: 8000
+  # ATL_TOMCAT_MAXTHREADS: 100
+  # ATL_TOMCAT_MINSPARETHREADS: 10
+  # ATL_TOMCAT_CONNECTIONTIMEOUT: 20000
+  # ATL_TOMCAT_ENABLELOOKUPS: false
+  # ATL_TOMCAT_PROTOCOL: "HTTP/1.1"
+  # ATL_TOMCAT_ACCEPTCOUNT: 10
+  # ATL_TOMCAT_MAXHTTPHEADERSIZE: 8192
+  #
+  ## Cookie age (Remember Me maximum time remain logged-in)
+  # ATL_AUTOLOGIN_COOKIE_AGE: 1209600
+  #
+  ## Home directory. This may be on a mounted volume; if so it
+  ## should be writable by the user crowd. See note below about UID mappings.
+  # CROWD_HOME: ""
+## End of Environment Variables (envVars)
+
+## JVM_SUPPORT_RECOMMENDED_ARGS
+## Additional container environment variables
+# extraEnv: "-XX:MaxMetaspaceSize=512m"

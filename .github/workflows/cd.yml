@@ -1,40 +1,63 @@
 name: Latest Stable Versions
+
 on:
   schedule:
     - cron: '0 8 * * *'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Download RSS
       run: |
         curl -sSO https://my.atlassian.com/download/feeds/confluence.rss
         curl -sSO https://my.atlassian.com/download/feeds/jira-software.rss
+        curl -sSO https://my.atlassian.com/download/feeds/crowd.rss
+
     - name: Check Confluence latest version
       id: getxmlcon
       uses: moxbot/get-xml-info@1.0
       with:
         xml-file: 'confluence.rss'
         xpath: '//title[contains(., "Linux")]'
+
     - name: Check Jira latest version
       id: getxmljira
       uses: moxbot/get-xml-info@1.0
       with:
         xml-file: 'jira-software.rss'
         xpath: '//title[contains(., "Linux")]'
+
+    - name: Check Crowd latest version
+      id: getxmlcrowd
+      uses: moxbot/get-xml-info@1.0
+      with:
+        xml-file: 'crowd.rss'
+        xpath: '//title[contains(., "TAR.GZ")]'
+
     - name: Update Confluence version
       env:
         CONFLUENCE_VERSION: ${{ steps.getxmlcon.outputs.info }}
       run: |
         scripts/update_chart_version.sh "confluence-server" "$CONFLUENCE_VERSION"
         rm confluence.rss
+
     - name: Update Jira version
       env:
         JIRA_SOFTWARE_VERSION: ${{ steps.getxmljira.outputs.info }}
       run: |
         scripts/update_chart_version.sh "jira-software" "$JIRA_SOFTWARE_VERSION"
         rm jira-software.rss
+
+    - name: Update Crowd version
+      env:
+        CROWD_VERSION: ${{ steps.getxmlcrowd.outputs.info }}
+      run: |
+        scripts/update_chart_version.sh "crowd" "$CROWD_VERSION"
+        rm crowd.rss
+
     - name: Create Pull Request
       id: cpr
       uses: moxbot/create-pull-request@v2

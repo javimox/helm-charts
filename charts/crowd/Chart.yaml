@@ -1,0 +1,44 @@
+apiVersion: v2
+name: crowd
+description: Centralized identity management
+
+# Application charts are a collection of templates that can be packaged into versioned archives
+# to be deployed.
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+version: 0.1.0
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+appVersion: 4.1.0
+
+icon: https://mox.sh/assets/images/crowd-logo.png
+
+dependencies:
+  - name: postgresql
+    version: 9.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+    tags:
+      - postgres
+
+keywords:
+- identities
+- directory
+- single sign-on
+- crowd
+- atlassian
+- application
+
+home: https://confluence.atlassian.com/crowd
+
+sources:
+- https://helm.sh
+- https://helm.mox.sh
+- https://hub.docker.com/r/atlassian/crowd
+
+maintainers:
+- name: jmox
+  email: jmox@pm.me
