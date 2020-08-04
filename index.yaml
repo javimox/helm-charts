@@ -562,6 +562,40 @@ entries:
     urls:
     - https://github.com/javimox/helm-charts/releases/download/confluence-server-0.1.1/confluence-server-0.1.1.tgz
     version: 0.1.1
+  crowd:
+  - apiVersion: v2
+    appVersion: 4.1.0
+    created: "2020-08-04T19:37:26.618836742Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Centralized identity management
+    digest: 0133a437b1470e19cd2c6f542bf88ced137d7496f35e3d81a940904a5879d927
+    home: https://confluence.atlassian.com/crowd
+    icon: https://mox.sh/assets/images/crowd-logo.png
+    keywords:
+    - identities
+    - directory
+    - single sign-on
+    - crowd
+    - atlassian
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: crowd
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/crowd
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/crowd-0.1.0/crowd-0.1.0.tgz
+    version: 0.1.0
   jira-software:
   - apiVersion: v2
     appVersion: 8.11.0
