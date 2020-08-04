@@ -51,7 +51,7 @@ The command deploys **Confluence server** on the Kubernetes cluster in the defau
 To uninstall/delete the `my-release` deployment:
 
 ```console
-$ helm delete my-release
+$ helm uninstall my-release
 ```
 
 The command removes (almost) all the Kubernetes components associated with the chart and deletes the release. See [PostgreSQL enabled](#uninstall-with-postgres-enabled) for more details.
@@ -103,91 +103,133 @@ $ helm upgrade my-release \
 
 The following tables lists the configurable parameters of the Confluence Server chart and their default values.
 
-|                   Parameter                   |                                                                                Description                                                                                |                            Default                            |
-|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| `image.registry`                              | Confluence Server Image registry                                                                                                                                          | `docker.io`                                                   |
-| `image.repository`                            | Confluence Server Image name                                                                                                                                              | `atlassian/confluence-server`                                 |
-| `image.tag`                                   | Confluence Server Image tag                                                                                                                                               | `{TAG_NAME}`                                                  |
-| `image.pullPolicy`                            | Confluence Server Image pull policy                                                                                                                                       | `IfNotPresent`                                                |
-| `image.pullSecrets`                           | Secrets to pull an image from a private Docker registry or repository                                                                                                     | `{}`                                                          |
-| `nameOverride`                                | String to partially override confluence-server.fullname template with a string (will prepend the release name)                                                            | `""`                                                          |
-| `fullnameOverride`                            | String to fully override confluence-server.fullname template with a string                                                                                                | `""`                                                          |
-| `serviceAccount.create`                       | Specifies whether a service account should be created                                                                                                                     | `false`                                                       |
-| `serviceAccount.annotations`                  | Map of service account annotations                                                                                                                                        | `{}`                                                          |
-| `serviceAcccount.name`                        | Name of existing service account                                                                                                                                          | `""`                                                          |
-| `podSecurityContext.fsGroup`                  | All processes of the container are also part of this supplementary group ID                                                                                               | `2002`                                                        |
-| `securityContext`                             | Container security context options                                                                                                                                        | `{}`                                                          |
-| `service.type`                                | Kubernetes Service type                                                                                                                                                   | `nodePort`                                                    |
-| `service.port`                                | Service HTTP port (Note: it must match with `envVars.ATL_TOMCAT_PORT`)                                                                                                    | `8090`                                                        |
-| `service.httpsPort`                           | Service HTTPS port  (Note: needs `envVars.ATL_TOMCAT_SCHEME: https`)                                                                                                      | `empty`                                                       |
-| `service.loadBalancer`                        | Kubernetes LoadBalancerIP to request                                                                                                                                      | `empty`                                                       |
-| `service.nodePorts.http`                      | Kubernetes http node port                                                                                                                                                 | `""`                                                          |
-| `service.nodePorts.https`                     | Kubernetes https node port                                                                                                                                                | `""`                                                          |
-| `ingress.enabled`                             | Enable ingress controller resource                                                                                                                                        | `false`                                                       |
-| `ingress.annotations`                         | Map of ingress annotations                                                                                                                                                | `{}`                                                          |
-| `ingress.hosts[0].host`                       | Confluence Server installation hostname                                                                                                                                   | `confluence-server.local`                                     |
-| `ingress.hosts[0].paths`                      | Path within the url structure                                                                                                                                             | `[]`                                                          |
-| `ingress.tls`                                 | TLS options                                                                                                                                                               | `[]`                                                          |
-| `ingress.tls[0].secretName`                   | TLS Secret (certificates)                                                                                                                                                 | `nil`                                                         |
-| `ingress.tls[0].hosts[0]`                     | TLS hosts                                                                                                                                                                 | `nil`                                                         |
-| `resources`                                   | CPU/Memory resource requests/limits                                                                                                                                       | Memory: `1Gi`, CPU: `500m`                                    |
-| `replicaCount`                                | Number of replicas for this deployment                                                                                                                                    | `1`                                                           |
-| `nodeSelector`                                | Node labels for pod assignment                                                                                                                                            | `{}`                                                          |
-| `tolerations`                                 | List of node taints to tolerate                                                                                                                                           | `[]`                                                          |
-| `affinity`                                    | Map of node/pod affinity labels                                                                                                                                           | `{}`                                                          |
-| `podAnnotations`                              | Map of annotations to add to the pods                                                                                                                                     | `{}`                                                          |
-| `persistence.enabled`                         | Enable persistence using PVC                                                                                                                                              | `true`                                                        |
-| `persistence.existingClaim`                   | Provide an existing `PersistentVolumeClaim` for the Confluence Server, the value is evaluated as a template                                                               | `""`                                                          |
-| `persistence.accessModes`                     | PVC Access Mode for Confluence Server volume                                                                                                                              | `ReadWriteOnce`                                               |
-| `persistence.size`                            | PVC Storage Request for Confluence Server volume                                                                                                                          | `10Gi`                                                        |
-| `persistence.storageClass`                    | PVC Storage Class for Confluence Server volume                                                                                                                            | `empty` (uses alpha storage annotation)                       |
-| `mountAttachments.enabled`                    | Enable persistence using PVC for the attachments directory. By default, the Attachments are stored with Confluence Server PVC if `persistence.enabled` is set to true     | `false`                                                       |
-| `mountAttachments.existingClaim`              | Provide an existing `PersistentVolumeClaim`, the value is evaluated as a template                                                                                         | `""`                                                          |
-| `mountAttachments.accessModes`                | PVC Access Mode for Confluence Server Attachments volume                                                                                                                  | `ReadWriteOnce`                                               |
-| `mountAttachments.size`                       | PVC Storage Request for Confluence Server Attachments volume                                                                                                              | `20Gi`                                                        |
-| `mountAttachments.storageClass`               | PVC Storage Class for Confluence Server Attachments volume                                                                                                                | `empty` (uses alpha storage annotation)                       |
-| `extraVolumeMounts`                           | Additional volume mounts to add to the pods                                                                                                                               | `[]`                                                          |
-| `extraVolumes`                                | Additional volumes to add to the pods                                                                                                                                     | `[]`                                                          |
-| `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                                                                   | `""`                                                          |
-| `readinessProbe`                              | Readiness probe values                                                                                                                                                    | `{}`                                                          |
-| `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Confluence handler is `/status`)                                                                                                  | `nil`                                                         |
-| `readinessProbe.httpGet.port`                 | Readiness probe port (Note: Confluence listens on internal port 8090)                                                                                                     | `nil`                                                         |
-| `readinessProbe.initialDelaySeconds`          | Delay before readiness probe is initiated                                                                                                                                 | `nil`                                                         |
-| `readinessProbe.periodSeconds`                | How often to perform the probe                                                                                                                                            | `nil`                                                         |
-| `readinessProbe.failureThreshold`             | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
-| `readinessProbe.timeoutSeconds`               | When the probe times out                                                                                                                                                  | `nil`                                                         |
-| `livenessProbe`                               | Liveness probe values                                                                                                                                                     | `{}`                                                          |
-| `livenessProbe.httpGet.path`                  | Liveness probe HTTP GET request (Note: Confluence handler is `/status`)                                                                                                   | `nil`                                                         |
-| `livenessProbe.httpGet.port`                  | Liveness probe port (Note: Confluence listens on internal port 8090)                                                                                                      | `nil`                                                         |
-| `livenessProbe.initialDelaySeconds`           | Delay before liveness probe is initiated                                                                                                                                  | `nil`                                                         |
-| `livenessProbe.periodSeconds`                 | How often to perform the probe                                                                                                                                            | `nil`                                                         |
-| `livenessProbe.failureThreshold`              | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
-| `livenessProbe.timeoutSeconds`                | When the probe times out                                                                                                                                                  | `nil`                                                         |
-| `postgresql.enabled`                          | Whether to use the PostgreSQL chart                                                                                                                                       | `true`                                                        |
-| `postgresql.image.registry`                   | PostgreSQL image registry                                                                                                                                                 | `docker.io`                                                   |
-| `postgresql.image.repository`                 | PostgreSQL image repository                                                                                                                                               | `bitnami/postgresql`                                          |
-| `postgresql.image.tag`                        | PostgreSQL image tag                                                                                                                                                      | `10`                                                          |
-| `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                                                                                                              | `IfNotPresent`                                                |
-| `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                                                                                                       | `confluence-server-db`                                        |
-| `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                                                                                                 | `nil`                                                         |
-| `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts). The value is evaluated as a template.                                                                  | `{{ .Release.Name }}-db-helper-cm`                            |
-| `databaseConnection.host`                     | Hostname of the database server                                                                                                                                           | `confluence-server-db`                                        |
-| `databaseConnection.user`                     | Jira database user                                                                                                                                                        | `confluenceuser`                                              |
-| `databaseConnection.password`                 | Jira database password                                                                                                                                                    | `"CHANGEME"`                                                  |
-| `databaseConnection.database`                 | Jira database name                                                                                                                                                        | `confluencedb`                                                |
-| `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created (See: `postgresql.initdbScriptsConfigMap`)                                             | `C`                                                           |
-| `databaseConnection.port`                     | Confluence database server port                                                                                                                                           | `5432`                                                        |
-| `databaseConnection.type`                     | Confluence database server type                                                                                                                                           | `postgresql`                                                  |
-| `databaseDrop.enabled`                        | Enable database removal. See [remove existing database](#remove-existing-database)                                                                                        | `false`                                                       |
-| `databaseDrop.dropIt`                         | Confirm database removal if set to `yes`                                                                                                                                  | `no`                                                          |
-| `caCerts.secret`                              | Secret that will be imported into the keystore using keytool                                                                                                              | `nil`                                                         |
-| `caCerts.storepass`                           | Keytool store password (storepass parameter)                                                                                                                              | `nil`                                                         |
-| `caCertsEnv`                                  | Any environment variable you would like to pass on to the OpenJDK init container. The value is evaluated as a template                                                    | `nil`                                                         |
-| `envVars`                                     | Confluence Server environment variables that will be injected in the ConfigMap. The value is evaluated as a template                                                      | `{}`                                                          |
-| `extraEnv`                                    | Enable additional Confluence Server container environment variables. The value is passed as string                                                                        | `nil`                                                         |
+### Global parameters
+
+| Parameter                               | Description                                                             | Default |
+|-----------------------------------------|-------------------------------------------------------------------------|---------|
+| `global.postgresql.postgresqlPassword`  | PostgreSQL admin password (overrides `postgresql.postgresqlPassword`)   | `nil`   |
+| `global.postgresql.replicationPassword` | Replication user password (overrides `postgresql.replication.password`) | `nil`   |
+
+### Common parameters
+
+| Parameter           | Description                                                                             | Default |
+|---------------------|-----------------------------------------------------------------------------------------|---------|
+| `nameOverride`      | String to partially override confluence-server.fullname (will prepend the release name) | `nil`   |
+| `fullnameOverride`  | String to fully override confluence-server.fullname                                     | `nil`   |
+
+### Confluence parameters
+
+| Parameter                    | Description                                                                           | Default                       |
+|------------------------------|---------------------------------------------------------------------------------------|-------------------------------|
+| `image.registry`             | Confluence Server Image registry                                                      | `docker.io`                   |
+| `image.repository`           | Confluence Server Image name                                                          | `atlassian/confluence-server` |
+| `image.tag`                  | Confluence Server Image tag                                                           | `{TAG_NAME}`                  |
+| `image.pullPolicy`           | Confluence Server Image pull policy                                                   | `IfNotPresent`                |
+| `image.pullSecrets`          | Secrets to pull an image from a private Docker registry or repository                 | `{}`                          |
+| `podSecurityContext.fsGroup` | All processes of the container are also part of this supplementary group ID           | `2002`                        |
+| `caCerts.secret`             | Secret that will be imported into the keystore using keytool                          | `nil`                         |
+| `caCerts.storepass`          | Keytool store password (storepass parameter)                                          | `nil`                         |
+| `caCertsEnv`                 | Any environment variable you would like to pass on to the OpenJDK init container      | `nil`                         |
+| `envVars`                    | Confluence Server environment variables that will be injected in the ConfigMap        | `{}`                          |
+| `extraEnv`                   | Enable additional Confluence Server container environment variables, passed as string | `nil`                         |
+
+### Dependencies
+
+Confluence requires a database. It can be either deployed as dependency using PostgreSQL subchart or configured a database connection to an external server.
+By default a PostgreSQL will be deployed and a user and a database will be created using the `databaseConnection` values.
+
+|  Parameter                           | Description                                                                              | Default                      |
+|--------------------------------------|------------------------------------------------------------------------------------------|------------------------------|
+| `postgresql.enabled`                 | Whether to use the PostgreSQL chart                                                      | `true`                       |
+| `postgresql.image.registry`          | PostgreSQL image registry                                                                | `docker.io`                  |
+| `postgresql.image.repository`        | PostgreSQL image repository                                                              | `bitnami/postgresql`         |
+| `postgresql.image.tag`               | PostgreSQL image tag                                                                     | `10`                         |
+| `postgresql.image.pullPolicy`        | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
+| `postgresql.fullnameOverride`        | String to fully override postgresql.fullname template with a string                      | `confluence-server-db`       |
+| `postgresql.persistence.size`        | PVC Storage Request for PostgreSQL volume                                                | `nil`                        |
+| `postgresql.initdbScriptsConfigMap`  | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
+| `databaseConnection.host`            | Hostname of the database server                                                          | `confluence-server-db`       |
+| `databaseConnection.user`            | Confluence database user                                                                 | `confluenceuser`             |
+| `databaseConnection.password`        | Confluence database password                                                             | `"CHANGEME"`                 |
+| `databaseConnection.database`        | Confluence database name                                                                 | `confluencedb`               |
+| `databaseConnection.lang`            | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
+| `databaseConnection.port`            | Confluence database server port                                                          | `5432`                       |
+| `databaseConnection.type`            | Confluence database server type                                                          | `postgresql`                 |
+| `databaseDrop.enabled`               | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
+| `databaseDrop.dropIt`                | Confirm database removal if set to `yes`                                                 | `no`                         |
+
+### Deployment parameters
+
+| Parameter                            | Description                                                                               | Default                    |
+|--------------------------------------|-------------------------------------------------------------------------------------------|----------------------------|
+| `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                        |
+| `securityContext`                    | Container security context options                                                        | `{}`                       |
+| `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m` |
+| `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                       |
+| `tolerations`                        | List of node taints to tolerate                                                           | `[]`                       |
+| `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                       |
+| `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                       |
+| `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                       |
+| `extraVolumes`                       | Additional volumes to add to the pods                                                     | `[]`                       |
+| `schedulerName`                      | Use an alternate scheduler, eg. `stork`                                                   | `""`                       |
+| `readinessProbe`                     | Readiness probe values                                                                    | `{}`                       |
+| `readinessProbe.httpGet.path`        | Readiness probe HTTP GET request (Note: Confluence handler is `/status`)                  | `nil`                      |
+| `readinessProbe.httpGet.port`        | Readiness probe port (Note: Confluence listens on internal port 8090)                     | `nil`                      |
+| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated                                                 | `nil`                      |
+| `readinessProbe.periodSeconds`       | How often to perform the probe                                                            | `nil`                      |
+| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
+| `readinessProbe.timeoutSeconds`      | When the probe times out                                                                  | `nil`                      |
+| `livenessProbe`                      | Liveness probe values                                                                     | `{}`                       |
+| `livenessProbe.httpGet.path`         | Liveness probe HTTP GET request (Note: Confluence handler is `/status`)                   | `nil`                      |
+| `livenessProbe.httpGet.port`         | Liveness probe port (Note: Confluence listens on internal port 8090)                      | `nil`                      |
+| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated                                                  | `nil`                      |
+| `livenessProbe.periodSeconds`        | How often to perform the probe                                                            | `nil`                      |
+| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
+| `livenessProbe.timeoutSeconds`       | When the probe times out                                                                  | `nil`                      |
+
+### Persistence parameters
+
+| Parameter                        | Description                                                          | Default         |
+|----------------------------------|----------------------------------------------------------------------|-----------------|
+| `persistence.enabled`            | Enable persistence using PVC                                         | `true`          |
+| `persistence.existingClaim`      | Provide an existing `PersistentVolumeClaim`, ealuated as a template  | `""`            |
+| `persistence.accessModes`        | PVC Access Mode for Confluence Server volume                         | `ReadWriteOnce` |
+| `persistence.size`               | PVC Storage Request for Confluence Server volume                     | `10Gi`          |
+| `persistence.storageClass`       | PVC Storage Class for Confluence Server volume                       | `empty`         |
+| `mountAttachments.enabled`       | Enable separate persistence for the attachments directory            | `false`         |
+| `mountAttachments.existingClaim` | Provide an existing `PersistentVolumeClaim`, evaluated as a template | `""`            |
+| `mountAttachments.accessModes`   | PVC Access Mode for Confluence Server Attachments volume             | `ReadWriteOnce` |
+| `mountAttachments.size`          | PVC Storage Request for Confluence Server Attachments volume         | `20Gi`          |
+| `mountAttachments.storageClass`  | PVC Storage Class for Confluence Server Attachments volume           | `empty`         |
+
+### RBAC parameters
+
+| Parameter                    | Description                                           | Default |
+|------------------------------|-------------------------------------------------------|---------|
+| `serviceAccount.create`      | Specifies whether a service account should be created | `false` |
+| `serviceAccount.annotations` | Map of service account annotations                    | `{}`    |
+| `serviceAcccount.name`       | Name of existing service account                      | `""`    |
+
+### Exposure parameters
+
+| Parameter                   | Description                                                            | Default                   |
+|-----------------------------|------------------------------------------------------------------------|---------------------------|
+| `service.type`              | Kubernetes Service type                                                | `ClusterIP`               |
+| `service.port`              | Service HTTP port (Note: it must match with `envVars.ATL_TOMCAT_PORT`) | `8090`                    |
+| `service.httpsPort`         | Service HTTPS port (Note: needs `envVars.ATL_TOMCAT_SCHEME: https`)    | `empty`                   |
+| `service.loadBalancer`      | Kubernetes LoadBalancerIP to request                                   | `empty`                   |
+| `service.nodePorts.http`    | Kubernetes http node port                                              | `""`                      |
+| `service.nodePorts.https`   | Kubernetes https node port                                             | `""`                      |
+| `ingress.enabled`           | Enable ingress controller resource                                     | `false`                   |
+| `ingress.annotations`       | Map of ingress annotations                                             | `{}`                      |
+| `ingress.hosts[0].host`     | Confluence Server installation hostname                                | `confluence-server.local` |
+| `ingress.hosts[0].paths`    | Path within the url structure                                          | `[]`                      |
+| `ingress.tls`               | TLS options                                                            | `[]`                      |
+| `ingress.tls[0].secretName` | TLS Secret (certificates)                                              | `nil`                     |
+| `ingress.tls[0].hosts[0]`   | TLS hosts                                                              | `nil`                     |
 
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+Each parameter can be specified during the Chart installation as follow:
 
 ```console
 $ helm install my-release \
@@ -202,7 +244,7 @@ $ helm install my-release \
 
 The above command sets the different parameters of the database connection.
 
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
+Alternatively, a YAML file can be provided to override the default `values.yaml`. For example:
 
 ```console
 $ helm install my-release -f values-production.yaml mox/confluence-server
@@ -225,11 +267,11 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 0.3.4
-```console
+Chart Version 0.3.5
+```diff
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
-@@ -58,7 +58,7 @@
+@@ -67,7 +67,7 @@
  ## Kubernetes svc configuration
  service:
    ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -238,7 +280,7 @@ Chart Version 0.3.4
    ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
    ##
    ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
-@@ -98,10 +98,10 @@
+@@ -107,10 +107,10 @@
  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
  resources:
    requests:
@@ -252,7 +294,7 @@ Chart Version 0.3.4
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -145,11 +145,11 @@
+@@ -154,11 +154,11 @@
  ## Persistent Volume CLaim
  ## Confluence Attachments directory
  mountAttachments:
@@ -266,7 +308,7 @@ Chart Version 0.3.4
  
    ## If defined, storageClassName: <storageClass>
    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-@@ -218,8 +218,8 @@
+@@ -227,8 +227,8 @@
  
    fullnameOverride: confluence-server-db
  
@@ -275,21 +317,19 @@ Chart Version 0.3.4
 +  # persistence:
 +  #   size: 8Gi
  
-   initdbScriptsConfigMap: |-
-     {{ .Release.Name }}-db-helper-cm
-@@ -272,13 +272,13 @@
+@@ -281,11 +281,13 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
 -envVars: {}
 +envVars:
    ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
-   ## default: 1024m
--  # JVM_MINIMUM_MEMORY: 2048m
+-  # JVM_MINIMUM_MEMORY: 1024m
++  ## default: 1024m
 +  JVM_MINIMUM_MEMORY: 2048m
    ## Memory / Heap Size (JVM_MAXIMUM_MEMORY) Mandatory, see @Notes above
-   ## default: 1024m
--  # JVM_MAXIMUM_MEMORY: 2048m
+-  # JVM_MAXIMUM_MEMORY: 1024m
++  ## default: 1024m
 +  JVM_MAXIMUM_MEMORY: 2048m
    #
    ## Tomcat and Reverse Proxy Settings
