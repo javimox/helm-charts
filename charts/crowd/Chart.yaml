@@ -19,7 +19,7 @@ icon: https://mox.sh/assets/images/crowd-logo.png
 dependencies:
   - name: postgresql
     version: 9.1
-    repository:  https://charts.bitnami.com/bitnami
+    repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
     tags:
       - postgres

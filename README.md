@@ -12,17 +12,31 @@ $ helm search repo mox
 $ helm install my-release mox/<chart>
 ```
 
+## Project Status
+
+`master` supports Helm 3 only, i. e. both `v1` and `v2` [API version](https://helm.sh/docs/topics/charts/#the-apiversion-field) charts are installable.
+
+Helm Charts of `mox` repository are available on:
+ * [helm.mox.sh](https://helm.mox.sh)
+ * [hub.helm.sh](https://hub.helm.sh/charts/mox)
+ * [artifacthub.io](https://artifacthub.io/packages/search?repo=mox)
+ * [hub.kubeapps.com](https://hub.kubeapps.com/charts/mox)
+
 ## Chart Sources
 
 * `charts/confluence-server`: Atlassian Confluence Server chart @ [helm.mox.sh](https://mox.sh/helm/charts/confluence-server/)
 * `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
+* `charts/crowd`: Atlassian Crowd chart @ [helm.mox.sh](https://mox.sh/helm/charts/crowd/)
 
-## Adding charts to the mox helm repository
+## Contribute
+
+Contributions are welcome! If you have any issue deploying these charts or a enhancement feature, feel free to open an issue on [my GitHub](https://github.com/javimox/helm-charts/tree/master).
+
+If you want to add your Charts to the **mox** repository, you are welcome to:
 
 * Fork this repository
-* Create a branch off master named after the chart
-* Commit and push origin the new branch
-* Create a Pull Request
+* Create a branch off master named after your chart
+* Create a PR
 
 ## About Helm
 
@@ -34,20 +48,6 @@ $ helm install my-release mox/<chart>
 * [@helm/kind-action](https://github.com/helm/kind-action)
 * [@helm/chart-testing-action](https://github.com/helm/chart-testing-action)
 * [@helm/chart-releaser-action](https://github.com/helm/chart-releaser-action)
-
-## Project Status
-
-`master` supports Helm 3 only, i. e. both `v1` and `v2` [API version](https://helm.sh/docs/topics/charts/#the-apiversion-field) charts are installable.
-
-## Results
-
-* The [Lint and Test Charts](/.github/workflows/lint-test.yaml) workflow uses [@helm/kind-action](https://www.github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster, and [@helm/chart-testing-action](https://www.github.com/helm/chart-testing-action) to lint and test the charts on every Pull Request and push
-  
-* The [Release Charts](/.github/workflows/release.yaml) workflow uses [@helm/chart-releaser-action](https://www.github.com/helm/chart-releaser-action) to turn this GitHub project into a self-hosted Helm chart repo. It does this – during every push to `master` – by checking each chart in this project, and whenever there's a new chart version, creates a corresponding [GitHub release](https://help.github.com/en/github/administering-a-repository/about-releases) named for the chart version, adds Helm chart artifacts to the release, and creates or updates an `index.yaml` file with metadata about those releases, which is then hosted on GitHub Pages
-
-## Credits
-
-* [Lint and Test Charts](https://github.com/helm/charts-repo-actions-demo.git)
 
 # License
 Copyright © 2020 mox.sh
