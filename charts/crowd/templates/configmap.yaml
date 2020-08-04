@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "crowd.fullname" . }}-cm
+  labels:
+    {{- include "crowd.labels" . | nindent 4 }}
+data:
+  {{- range $key, $val := .Values.envVars }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  ATL_TOMCAT_PORT: {{ .Values.service.port | quote }}
+  {{- if .Values.ingress.enabled }}
+  ATL_PROXY_NAME: {{ (index .Values.ingress.hosts 0).host | quote }}
+  ATL_PROXY_PORT: {{ if .Values.ingress.tls }}"443"{{ else }}"80"{{ end }}
+  ATL_TOMCAT_SCHEME: {{ if .Values.ingress.tls }}"https"{{ else }}"http"{{ end }}
+  ATL_TOMCAT_SECURE: {{ if .Values.ingress.tls }}"true"{{ else }}"false"{{ end }}
+  {{- end }}
