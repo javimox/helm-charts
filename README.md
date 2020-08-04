@@ -25,8 +25,8 @@ Helm Charts of `mox` repository are available on:
 ## Chart Sources
 
 * `charts/confluence-server`: Atlassian Confluence Server chart @ [helm.mox.sh](https://mox.sh/helm/charts/confluence-server/)
-* `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
 * `charts/crowd`: Atlassian Crowd chart @ [helm.mox.sh](https://mox.sh/helm/charts/crowd/)
+* `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
 
 ## Contribute
 

@@ -1,4 +1,4 @@
-# Atlassian Crowd
+## Atlassian Crowd
 
 [Crowd](https://www.atlassian.com/software/crowd) is the directory service solution from **Atlassian** that provides Single sign-on (SSO) and OpenID compatibility.
 
@@ -11,7 +11,6 @@ $ helm repo add mox https://helm.mox.sh
 $ helm repo update
 $ helm install my-release mox/crowd
 ```
-
 ## Introduction
 
 This chart bootstraps a [Crowd server](https://hub.docker.com/r/atlassian/crowd/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
@@ -27,7 +26,6 @@ It is available on:
 - Kubernetes 1.12+
 - Helm 2.11+ or Helm 3.0-beta3+
 - PV provisioner support in the underlying infrastructure (Only when persisting data)
-- At least 1GB Memory
 
 ## Installing the Chart
 
@@ -51,7 +49,7 @@ The command deploys **Crowd server** on the Kubernetes cluster in the default co
 To uninstall/delete the `my-release` deployment:
 
 ```console
-$ helm delete my-release
+$ helm uninstall my-release
 ```
 
 The command removes (almost) all the Kubernetes components associated with the chart and deletes the release. See [PostgreSQL enabled](#uninstall-with-postgres-enabled) for more details.
@@ -108,84 +106,125 @@ $ helm upgrade my-release \
 
 The following tables lists the configurable parameters of the Crowd Server chart and their default values.
 
-|                   Parameter                   |                                                           Description                                                          |                  Default                     |
-|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `image.registry`                              | Crowd Server Image registry                                                                                                    | `docker.io`                                  |
-| `image.repository`                            | Crowd Server Image name                                                                                                        | `atlassian/crowd`                            |
-| `image.tag`                                   | Crowd Server Image tag                                                                                                         | `{TAG_NAME}`                                 |
-| `image.pullPolicy`                            | Crowd Server Image pull policy                                                                                                 | `IfNotPresent`                               |
-| `image.pullSecrets`                           | Secrets to pull an image from a private Docker registry or repository                                                          | `{}`                                         |
-| `nameOverride`                                | String to partially override crowd.fullname template with a string (will prepend the release name)                             | `""`                                         |
-| `fullnameOverride`                            | String to fully override crowd.fullname template with a string                                                                 | `""`                                         |
-| `serviceAccount.create`                       | Specifies whether a service account should be created                                                                          | `false`                                      |
-| `serviceAccount.annotations`                  | Map of service account annotations                                                                                             | `{}`                                         |
-| `serviceAcccount.name`                        | Name of existing service account                                                                                               | `""`                                         |
-| `podSecurityContext.fsGroup`                  | All processes of the container are also part of this supplementary group ID                                                    | `2002`                                       |
-| `securityContext`                             | Container security context options                                                                                             | `{}`                                         |
-| `service.type`                                | Kubernetes Service type                                                                                                        | `nodePort`                                   |
-| `service.port`                                | Service HTTP port (Note: it must match with `envVars.ATL_TOMCAT_PORT`)                                                         | `8095`                                       |
-| `service.httpsPort`                           | Service HTTPS port  (Note: needs `envVars.ATL_TOMCAT_SCHEME: https`)                                                           | `empty`                                      |
-| `service.loadBalancer`                        | Kubernetes LoadBalancerIP to request                                                                                           | `empty`                                      |
-| `service.nodePorts.http`                      | Kubernetes http node port                                                                                                      | `""`                                         |
-| `service.nodePorts.https`                     | Kubernetes https node port                                                                                                     | `""`                                         |
-| `ingress.enabled`                             | Enable ingress controller resource                                                                                             | `false`                                      |
-| `ingress.annotations`                         | Map of ingress annotations                                                                                                     | `{}`                                         |
-| `ingress.hosts[0].host`                       | Crowd Server installation hostname                                                                                             | `crowd.local`                                |
-| `ingress.hosts[0].paths`                      | Path within the url structure                                                                                                  | `[]`                                         |
-| `ingress.tls`                                 | TLS options                                                                                                                    | `[]`                                         |
-| `ingress.tls[0].secretName`                   | TLS Secret (certificates)                                                                                                      | `nil`                                        |
-| `ingress.tls[0].hosts[0]`                     | TLS hosts                                                                                                                      | `nil`                                        |
-| `resources`                                   | CPU/Memory resource requests/limits                                                                                            | Memory: `1Gi`, CPU: `500m`                   |
-| `replicaCount`                                | Number of replicas for this deployment                                                                                         | `1`                                          |
-| `nodeSelector`                                | Node labels for pod assignment                                                                                                 | `{}`                                         |
-| `tolerations`                                 | List of node taints to tolerate                                                                                                | `[]`                                         |
-| `affinity`                                    | Map of node/pod affinity labels                                                                                                | `{}`                                         |
-| `podAnnotations`                              | Map of annotations to add to the pods                                                                                          | `{}`                                         |
-| `persistence.enabled`                         | Enable persistence using PVC                                                                                                   | `true`                                       |
-| `persistence.existingClaim`                   | Provide an existing `PersistentVolumeClaim` for the Crowd Server, the value is evaluated as a template                         | `""`                                         |
-| `persistence.accessModes`                     | PVC Access Mode for Crowd Server volume                                                                                        | `ReadWriteOnce`                              |
-| `persistence.size`                            | PVC Storage Request for Crowd Server volume                                                                                    | `10Gi`                                       |
-| `persistence.storageClass`                    | PVC Storage Class for Crowd Server volume                                                                                      | `empty` (uses alpha storage annotation)      |
-| `extraVolumeMounts`                           | Additional volume mounts to add to the pods                                                                                    | `[]`                                         |
-| `extraVolumes`                                | Additional volumes to add to the pods                                                                                          | `[]`                                         |
-| `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                        | `""`                                         |
-| `readinessProbe`                              | Readiness probe values                                                                                                         | `{}`                                         |
-| `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Crowd handler is `/status`)                                                            | `nil`                                        |
-| `readinessProbe.httpGet.port`                 | Readiness probe port (Note: Crowd listens on internal port 8095)                                                               | `nil`                                        |
-| `readinessProbe.initialDelaySeconds`          | Delay before readiness probe is initiated                                                                                      | `nil`                                        |
-| `readinessProbe.periodSeconds`                | How often to perform the probe                                                                                                 | `nil`                                        |
-| `readinessProbe.failureThreshold`             | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                     | `nil`                                        |
-| `readinessProbe.timeoutSeconds`               | When the probe times out                                                                                                       | `nil`                                        |
-| `livenessProbe`                               | Liveness probe values                                                                                                          | `{}`                                         |
-| `livenessProbe.httpGet.path`                  | Liveness probe HTTP GET request (Note: Crowd handler is `/status`)                                                             | `nil`                                        |
-| `livenessProbe.httpGet.port`                  | Liveness probe port (Note: Crowd listens on internal port 8095)                                                                | `nil`                                        |
-| `livenessProbe.initialDelaySeconds`           | Delay before liveness probe is initiated                                                                                       | `nil`                                        |
-| `livenessProbe.periodSeconds`                 | How often to perform the probe                                                                                                 | `nil`                                        |
-| `livenessProbe.failureThreshold`              | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                     | `nil`                                        |
-| `livenessProbe.timeoutSeconds`                | When the probe times out                                                                                                       | `nil`                                        |
-| `postgresql.enabled`                          | Whether to use the PostgreSQL chart                                                                                            | `true`                                       |
-| `postgresql.image.registry`                   | PostgreSQL image registry                                                                                                      | `docker.io`                                  |
-| `postgresql.image.repository`                 | PostgreSQL image repository                                                                                                    | `bitnami/postgresql`                         |
-| `postgresql.image.tag`                        | PostgreSQL image tag                                                                                                           | `11`                                         |
-| `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                                                                   | `IfNotPresent`                               |
-| `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                                                            | `crowd-db`                                   |
-| `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                                                      | `nil`                                        |
-| `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts). The value is evaluated as a template.                       | `{{ .Release.Name }}-db-helper-cm`           |
-| `databaseConnection.host`                     | Hostname of the database server. See [Database connection](#database-connection).                                              | `crowd-db`                                   |
-| `databaseConnection.user`                     | Crowd database user. See [Database connection](#database-connection).                                                          | `crowduser`                                  |
-| `databaseConnection.password`                 | Crowd database password.See [Database connection](#database-connection).                                                       | `"CHANGEME"`                                 |
-| `databaseConnection.database`                 | Crowd database name. See [Database connection](#database-connection).                                                          | `crowddb`                                    |
-| `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created (See: `postgresql.initdbScriptsConfigMap`)  | `C`                                          |
-| `databaseDrop.enabled`                        | Enable database removal. See [remove existing database](#remove-existing-database)                                             | `false`                                      |
-| `databaseDrop.dropIt`                         | Confirm database removal if set to `yes`                                                                                       | `no`                                         |
-| `caCerts.secret`                              | Secret that will be imported into the keystore using keytool                                                                   | `nil`                                        |
-| `caCerts.storepass`                           | Keytool store password (storepass parameter)                                                                                   | `nil`                                        |
-| `caCertsEnv`                                  | Any environment variable you would like to pass on to the OpenJDK init container. The value is evaluated as a template         | `nil`                                        |
-| `envVars`                                     | Crowd Server environment variables that will be injected in the ConfigMap. The value is evaluated as a template                | `{}`                                         |
-| `extraEnv`                                    | Enable additional Crowd Server container environment variables. The value is passed as string                                  | `nil`                                        |
+### Global parameters
 
+| Parameter                               | Description                                                             | Default |
+|-----------------------------------------|-------------------------------------------------------------------------|---------|
+| `global.postgresql.postgresqlPassword`  | PostgreSQL admin password (overrides `postgresql.postgresqlPassword`)   | `nil`   |
+| `global.postgresql.replicationPassword` | Replication user password (overrides `postgresql.replication.password`) | `nil`   |
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+### Common parameters
+
+| Parameter           | Description                                                                 | Default |
+|---------------------|-----------------------------------------------------------------------------|---------|
+| `nameOverride`      | String to partially override crowd.fullname (will prepend the release name) | `nil`   |
+| `fullnameOverride`  | String to fully override crowd.fullname                                     | `nil`   |
+
+## Crowd parameters
+
+| Parameter                    | Description                                                                      | Default           |
+|------------------------------|----------------------------------------------------------------------------------|-------------------|
+| `image.registry`             | Crowd Server Image registry                                                      | `docker.io`       |
+| `image.repository`           | Crowd Server Image name                                                          | `atlassian/crowd` |
+| `image.tag`                  | Crowd Server Image tag                                                           | `{TAG_NAME}`      |
+| `image.pullPolicy`           | Crowd Server Image pull policy                                                   | `IfNotPresent`    |
+| `image.pullSecrets`          | Secrets to pull an image from a private Docker registry or repository            | `{}`              |
+| `podSecurityContext.fsGroup` | All processes of the container are also part of this supplementary group ID      | `2004`            |
+| `caCerts.secret`             | Secret that will be imported into the keystore using keytool                     | `nil`             |
+| `caCerts.storepass`          | Keytool store password (storepass parameter)                                     | `nil`             |
+| `caCertsEnv`                 | Any environment variable you would like to pass on to the OpenJDK init container | `nil`             |
+| `envVars`                    | Crowd Server environment variables that will be injected in the ConfigMap        | `{}`              |
+| `extraEnv`                   | Enable additional Crowd Server container environment variables, passed as string | `nil`             |
+
+### Dependencies
+
+Crowd requires a database. It can be either deployed as dependency using PostgreSQL subchart or configured a database connection to an external server.
+By default a PostgreSQL will be deployed and a user and a database will be created using the `databaseConnection` values.
+
+|  Parameter                           | Description                                                                                       | Default                      |
+|--------------------------------------|---------------------------------------------------------------------------------------------------|------------------------------|
+| `postgresql.enabled`                          | Whether to use the PostgreSQL chart                                                      | `true`                       |
+| `postgresql.image.registry`                   | PostgreSQL image registry                                                                | `docker.io`                  |
+| `postgresql.image.repository`                 | PostgreSQL image repository                                                              | `bitnami/postgresql`         |
+| `postgresql.image.tag`                        | PostgreSQL image tag                                                                     | `11`                         |
+| `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
+| `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                      | `crowd-db`                   |
+| `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                | `8Gi`                        |
+| `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
+| `databaseConnection.host`                     | Hostname of the database server. See [Database connection](#database-connection)         | `crowd-db`                   |
+| `databaseConnection.user`                     | Crowd database user. See [Database connection](#database-connection)                     | `crowduser`                  |
+| `databaseConnection.password`                 | Crowd database password.See [Database connection](#database-connection)                  | `"CHANGEME"`                 |
+| `databaseConnection.database`                 | Crowd database name. See [Database connection](#database-connection)                     | `crowddb`                    |
+| `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
+| `databaseDrop.enabled`                        | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
+| `databaseDrop.dropIt`                         | Confirm database removal if set to `yes`                                                 | `no`                         |
+
+### Deployment parameters
+
+| Parameter                            | Description                                                                               | Default                    |
+|--------------------------------------|-------------------------------------------------------------------------------------------|----------------------------|
+| `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                        |
+| `securityContext`                    | Container security context options                                                        | `{}`                       |
+| `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m` |
+| `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                       |
+| `tolerations`                        | List of node taints to tolerate                                                           | `[]`                       |
+| `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                       |
+| `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                       |
+| `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                       |
+| `extraVolumes`                       | Additional volumes to add to the pods                                                     | `[]`                       |
+| `schedulerName`                      | Use an alternate scheduler, eg. `stork`                                                   | `""`                       |
+| `readinessProbe`                     | Readiness probe values                                                                    | `{}`                       |
+| `readinessProbe.httpGet.path`        | Readiness probe HTTP GET request (Note: Crowd handler is `/status`)                       | `nil`                      |
+| `readinessProbe.httpGet.port`        | Readiness probe port (Note: Crowd listens on internal port 8095)                          | `nil`                      |
+| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated                                                 | `nil`                      |
+| `readinessProbe.periodSeconds`       | How often to perform the probe                                                            | `nil`                      |
+| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
+| `readinessProbe.timeoutSeconds`      | When the probe times out                                                                  | `nil`                      |
+| `livenessProbe`                      | Liveness probe values                                                                     | `{}`                       |
+| `livenessProbe.httpGet.path`         | Liveness probe HTTP GET request (Note: Crowd handler is `/status`)                        | `nil`                      |
+| `livenessProbe.httpGet.port`         | Liveness probe port (Note: Crowd listens on internal port 8095)                           | `nil`                      |
+| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated                                                  | `nil`                      |
+| `livenessProbe.periodSeconds`        | How often to perform the probe                                                            | `nil`                      |
+| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
+| `livenessProbe.timeoutSeconds`       | When the probe times out                                                                  | `nil`                      |
+
+### Persistence parameters
+
+| Parameter                   | Description                                                                    | Default         |
+|-----------------------------|--------------------------------------------------------------------------------|-----------------|
+| `persistence.enabled`       | Enable persistence using PVC                                                   | `true`          |
+| `persistence.existingClaim` | Provide an existing `PersistentVolumeClaim` for Crowd, evaluated as a template | `""`            |
+| `persistence.accessModes`   | PVC Access Mode for Crowd Server volume                                        | `ReadWriteOnce` |
+| `persistence.size`          | PVC Storage Request for Crowd Server volume                                    | `10Gi`          |
+| `persistence.storageClass`  | PVC Storage Class for Crowd Server volume                                      | `empty`         |
+
+### RBAC parameters
+
+| Parameter                    | Description                                           | Default |
+|------------------------------|-------------------------------------------------------|---------|
+| `serviceAccount.create`      | Specifies whether a service account should be created | `false` |
+| `serviceAccount.annotations` | Map of service account annotations                    | `{}`    |
+| `serviceAcccount.name`       | Name of existing service account                      | `""`    |
+
+### Exposure parameters
+
+| Parameter                   | Description                                                            | Default       |
+|-----------------------------|------------------------------------------------------------------------|---------------|
+| `service.type`              | Kubernetes Service type                                                | `ClusterIP`   |
+| `service.port`              | Service HTTP port (Note: it must match with `envVars.ATL_TOMCAT_PORT`) | `8095`        |
+| `service.httpsPort`         | Service HTTPS port  (Note: needs `envVars.ATL_TOMCAT_SCHEME: https`)   | `empty`       |
+| `service.loadBalancer`      | Kubernetes LoadBalancerIP to request                                   | `empty`       |
+| `service.nodePorts.http`    | Kubernetes http node port                                              | `""`          |
+| `service.nodePorts.https`   | Kubernetes https node port                                             | `""`          |
+| `ingress.enabled`           | Enable ingress controller resource                                     | `false`       |
+| `ingress.annotations`       | Map of ingress annotations                                             | `{}`          |
+| `ingress.hosts[0].host`     | Crowd Server installation hostname                                     | `crowd.local` |
+| `ingress.hosts[0].paths`    | Path within the url structure                                          | `[]`          |
+| `ingress.tls`               | TLS options                                                            | `[]`          |
+| `ingress.tls[0].secretName` | TLS Secret (certificates)                                              | `nil`         |
+| `ingress.tls[0].hosts[0]`   | TLS hosts                                                              | `nil`         |
+
+Each parameter can be specified during the Chart installation as follow:
 
 ```console
 $ helm install my-release \
@@ -200,7 +239,7 @@ $ helm install my-release \
 
 The above command sets the different parameters of the database connection.
 
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
+Alternatively, a YAML file can be provided to override the default `values.yaml`. For example:
 
 ```console
 $ helm install my-release -f values-production.yaml mox/crowd
@@ -224,10 +263,10 @@ $ helm upgrade --install my-release \
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
 Chart Version 0.1.1
-```console
+```diff
 --- crowd/values.yaml
 +++ crowd/values-production.yaml
-@@ -252,11 +252,11 @@
+@@ -261,11 +261,11 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
