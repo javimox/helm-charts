@@ -51,7 +51,7 @@ The command deploys **Jira software** on the Kubernetes cluster in the default c
 To uninstall/delete the `my-release` deployment:
 
 ```console
-$ helm delete my-release
+$ helm uninstall my-release
 ```
 
 The command removes (almost) all the Kubernetes components associated with the chart and deletes the release. See [PostgreSQL enabled](#uninstall-with-postgres-enabled) for more details.
@@ -103,89 +103,131 @@ $ helm upgrade my-release \
 
 The following tables lists the configurable parameters of the Jira Software chart and their default values.
 
-|                   Parameter                   |                                                                                Description                                                                                |                            Default                            |
-|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| `image.registry`                              | Jira Software Image registry                                                                                                                                              | `docker.io`                                                   |
-| `image.repository`                            | Jira Software Image name                                                                                                                                                  | `atlassian/jira-software`                                     |
-| `image.tag`                                   | Jira Software Image tag                                                                                                                                                   | `{TAG_NAME}`                                                  |
-| `image.pullPolicy`                            | Jira Software Image pull policy                                                                                                                                           | `IfNotPresent`                                                |
-| `image.pullSecrets`                           | Secrets to pull an image from a private Docker registry or repository                                                                                                     | `{}`                                                          |
-| `nameOverride`                                | String to partially override jira-software.fullname template with a string (will prepend the release name)                                                                | `""`                                                          |
-| `fullnameOverride`                            | String to fully override jira-software.fullname template with a string                                                                                                    | `""`                                                          |
-| `serviceAccount.create`                       | Specifies whether a service account should be created                                                                                                                     | `false`                                                       |
-| `serviceAccount.annotations`                  | Map of service account annotations                                                                                                                                        | `{}`                                                          |
-| `serviceAcccount.name`                        | Name of existing service account                                                                                                                                          | `""`                                                          |
-| `podSecurityContext.fsGroup`                  | All processes of the container are also part of this supplementary group ID                                                                                               | `2001`                                                        |
-| `securityContext`                             | Container security context options                                                                                                                                        | `{}`                                                          |
-| `service.type`                                | Kubernetes Service type                                                                                                                                                   | `ClusterIP`                                                   |
-| `service.port`                                | Service HTTP port (Note: it must match with `envVars.ATL_TOMCAT_PORT`)                                                                                                    | `8080`                                                        |
-| `service.httpsPort`                           | Service HTTPS port  (Note: needs `envVars.ATL_TOMCAT_SCHEME: https`)                                                                                                      | `empty`                                                       |
-| `service.loadBalancer`                        | Kubernetes LoadBalancerIP to request                                                                                                                                      | `empty`                                                       |
-| `service.nodePorts.http`                      | Kubernetes http node port                                                                                                                                                 | `""`                                                          |
-| `service.nodePorts.https`                     | Kubernetes https node port                                                                                                                                                | `""`                                                          |
-| `ingress.enabled`                             | Enable ingress controller resource                                                                                                                                        | `false`                                                       |
-| `ingress.annotations`                         | Map of ingress annotations                                                                                                                                                | `{}`                                                          |
-| `ingress.hosts[0].host`                       | JIra Software installation hostname                                                                                                                                       | `jira-server.local`                                           |
-| `ingress.hosts[0].paths`                      | Path within the url structure                                                                                                                                             | `[]`                                                          |
-| `ingress.tls`                                 | TLS options                                                                                                                                                               | `[]`                                                          |
-| `ingress.tls[0].secretName`                   | TLS Secret (certificates)                                                                                                                                                 | `nil`                                                         |
-| `ingress.tls[0].hosts[0]`                     | TLS hosts                                                                                                                                                                 | `nil`                                                         |
-| `resources`                                   | CPU/Memory resource requests/limits                                                                                                                                       | Memory: `1Gi`, CPU: `500m`                                    |
-| `replicaCount`                                | Number of replicas for this deployment                                                                                                                                    | `1`                                                           |
-| `nodeSelector`                                | Node labels for pod assignment                                                                                                                                            | `{}`                                                          |
-| `tolerations`                                 | List of node taints to tolerate                                                                                                                                           | `[]`                                                          |
-| `affinity`                                    | Map of node/pod affinity labels                                                                                                                                           | `{}`                                                          |
-| `podAnnotations`                              | Map of annotations to add to the pods                                                                                                                                     | `{}`                                                          |
-| `persistence.enabled`                         | Enable persistence using PVC                                                                                                                                              | `true`                                                        |
-| `persistence.existingClaim`                   | Provide an existing `PersistentVolumeClaim` for Jira, the value is evaluated as a template                                                                                | `""`                                                          |
-| `persistence.accessModes`                     | PVC Access Mode for Jira Software volume                                                                                                                                  | `ReadWriteOnce`                                               |
-| `persistence.size`                            | PVC Storage Request for Jira Software volume                                                                                                                              | `10Gi`                                                        |
-| `persistence.storageClass`                    | PVC Storage Class for Jira Software volume                                                                                                                                | `empty` (uses alpha storage annotation)                       |
-| `extraVolumeMounts`                           | Additional volume mounts to add to the pods                                                                                                                               | `[]`                                                          |
-| `extraVolumes`                                | Additional volumes to add to the pods                                                                                                                                     | `[]`                                                          |
-| `schedulerName`                               | Use an alternate scheduler, eg. `stork`                                                                                                                                   | `""`                                                          |
-| `readinessProbe`                              | Readiness probe values                                                                                                                                                    | `{}`                                                          |
-| `readinessProbe.httpGet.path`                 | Readiness probe HTTP GET request (Note: Jira handler is `/status`)                                                                                                        | `nil`                                                         |
-| `readinessProbe.httpGet.port`                 | Readiness probe port (Note: Jira listens on internal port 8080)                                                                                                           | `nil`                                                         |
-| `readinessProbe.initialDelaySeconds`          | Delay before readiness probe is initiated                                                                                                                                 | `nil`                                                         |
-| `readinessProbe.periodSeconds`                | How often to perform the probe                                                                                                                                            | `nil`                                                         |
-| `readinessProbe.failureThreshold`             | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
-| `readinessProbe.timeoutSeconds`               | When the probe times out                                                                                                                                                  | `nil`                                                         |
-| `livenessProbe`                               | Liveness probe values                                                                                                                                                     | `{}`                                                          |
-| `livenessProbe.httpGet.path`                  | Liveness probe HTTP GET request (Note: Jira handler is `/status`)                                                                                                         | `nil`                                                         |
-| `livenessProbe.httpGet.port`                  | Liveness probe port (Note: Jira listens on internal port 8080)                                                                                                            | `nil`                                                         |
-| `livenessProbe.initialDelaySeconds`           | Delay before liveness probe is initiated                                                                                                                                  | `nil`                                                         |
-| `livenessProbe.periodSeconds`                 | How often to perform the probe                                                                                                                                            | `nil`                                                         |
-| `livenessProbe.failureThreshold`              | Minimum consecutive failures for the probe to be considered failed after having succeeded.                                                                                | `nil`                                                         |
-| `livenessProbe.timeoutSeconds`                | When the probe times out                                                                                                                                                  | `nil`                                                         |
-| `postgresql.enabled`                          | Whether to use the PostgreSQL chart                                                                                                                                       | `true`                                                        |
-| `postgresql.image.registry`                   | PostgreSQL image registry                                                                                                                                                 | `docker.io`                                                   |
-| `postgresql.image.repository`                 | PostgreSQL image repository                                                                                                                                               | `bitnami/postgresql`                                          |
-| `postgresql.image.tag`                        | PostgreSQL image tag                                                                                                                                                      | `11`                                                          |
-| `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                                                                                                              | `IfNotPresent`                                                |
-| `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                                                                                                       | `jira-software-db`                                            |
-| `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                                                                                                 | `8Gi`                                                         |
-| `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts). The value is evaluated as a template.                                                                  | `{{ .Release.Name }}-db-helper-cm`                            |
-| `databaseConnection.host`                     | Hostname of the database server                                                                                                                                           | `jira-software-db`                                            |
-| `databaseConnection.user`                     | Jira database user                                                                                                                                                        | `jirauser`                                                    |
-| `databaseConnection.password`                 | Jira database password                                                                                                                                                    | `"CHANGEME"`                                                  |
-| `databaseConnection.database`                 | Jira database name                                                                                                                                                        | `jiradb`                                                      |
-| `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created (See: `postgresql.initdbScriptsConfigMap`)                                             | `C`                                                           |
-| `databaseConnection.port`                     | Jira database server port                                                                                                                                                 | `5432`                                                        |
-| `databaseConnection.urlPrefix`                | Jira JDBC Prefix URL                                                                                                                                                      | `jdbc:postgresql`                                             |
-| `databaseConnection.databaseDriver`           | Jira Database driver                                                                                                                                                      | `org.postgresql.Driver`                                       |
-| `databaseConnection.type`                     | Jira database server type                                                                                                                                                 | `postgres72`                                                  |
-| `databaseConnection.schemaName`               | Database schema name (Note: it depends on the `databaseConnection.type` used)                                                                                             | `public`                                                      |
-| `databaseDrop.enabled`                        | Enable database removal. See [remove existing database](#remove-existing-database)                                                                                        | `false`                                                       |
-| `databaseDrop.dropIt`                         | Confirm database removal if set to `yes`                                                                                                                                  | `no`                                                          |
-| `caCerts.secret`                              | Secret that will be imported into the keystore using keytool                                                                                                              | `nil`                                                         |
-| `caCerts.storepass`                           | Keytool store password (storepass parameter)                                                                                                                              | `nil`                                                         |
-| `caCertsEnv`                                  | Any environment variable you would like to pass on to the OpenJDK init container. The value is evaluated as a template                                                    | `nil`                                                         |
-| `envVars`                                     | Jira Software environment variables that will be injected in the ConfigMap. The value is evaluated as a template                                                          | `{}`                                                          |
-| `extraEnv`                                    | Enable additional Jira container environment variables. The value is passed as string                                                                                     | `nil`                                                         | 
+### Global parameters
+
+| Parameter                               | Description                                                             | Default |
+|-----------------------------------------|-------------------------------------------------------------------------|---------|
+| `global.postgresql.postgresqlPassword`  | PostgreSQL admin password (overrides `postgresql.postgresqlPassword`)   | `nil`   |
+| `global.postgresql.replicationPassword` | Replication user password (overrides `postgresql.replication.password`) | `nil`   |
+
+### Common parameters
+
+| Parameter           | Description                                                                         | Default |
+|---------------------|-------------------------------------------------------------------------------------|---------|
+| `nameOverride`      | String to partially override jira-software.fullname (will prepend the release name) | `nil`   |
+| `fullnameOverride`  | String to fully override jira-software.fullname                                     | `nil`   |
+
+## Jira parameters
+
+| Parameter                    | Description                                                                      | Default                    |
+|------------------------------|----------------------------------------------------------------------------------|----------------------------|
+| `image.registry`             | Jira Software Image registry                                                     | `docker.io`                |
+| `image.repository`           | Jira Software Image name                                                         | `atlassian/jira-softwarer` |
+| `image.tag`                  | Jira Software Image tag                                                          | `{TAG_NAME}`               |
+| `image.pullPolicy`           | Jira Software Image pull policy                                                  | `IfNotPresent`             |
+| `image.pullSecrets`          | Secrets to pull an image from a private Docker registry or repository            | `{}`                       |
+| `podSecurityContext.fsGroup` | All processes of the container are also part of this supplementary group ID      | `2001`                     |
+| `caCerts.secret`             | Secret that will be imported into the keystore using keytool                     | `nil`                      |
+| `caCerts.storepass`          | Keytool store password (storepass parameter)                                     | `nil`                      |
+| `caCertsEnv`                 | Any environment variable you would like to pass on to the OpenJDK init container | `nil`                      |
+| `envVars`                    | Jira Software environment variables that will be injected in the ConfigMap       | `{}`                       |
+| `extraEnv`                   | Enable additional Jira container environment variables, passed as string         | `nil`                      |
+
+### Dependencies
+
+Jira Software requires a database. It can be either deployed as dependency using PostgreSQL subchart or configured a database connection to an external server.
+By default a PostgreSQL will be deployed and a user and a database will be created using the `databaseConnection` values.
+
+|  Parameter                           | Description                                                                                       | Default                      |
+|--------------------------------------|---------------------------------------------------------------------------------------------------|------------------------------|
+| `postgresql.enabled`                          | Whether to use the PostgreSQL chart                                                      | `true`                       |
+| `postgresql.image.registry`                   | PostgreSQL image registry                                                                | `docker.io`                  |
+| `postgresql.image.repository`                 | PostgreSQL image repository                                                              | `bitnami/postgresql`         |
+| `postgresql.image.tag`                        | PostgreSQL image tag                                                                     | `11`                         |
+| `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
+| `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                      | `jira-software-db`           |
+| `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                | `8Gi`                        |
+| `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
+| `databaseConnection.host`                     | Hostname of the database server                                                          | `jira-software-db`           |
+| `databaseConnection.user`                     | Jira database user                                                                       | `jirauser`                   |
+| `databaseConnection.password`                 | Jira database password                                                                   | `"CHANGEME"`                 |
+| `databaseConnection.database`                 | Jira database name                                                                       | `jiradb`                     |
+| `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
+| `databaseConnection.port`                     | Jira database server port                                                                | `5432`                       |
+| `databaseConnection.urlPrefix`                | Jira JDBC Prefix URL                                                                     | `jdbc:postgresql`            |
+| `databaseConnection.databaseDriver`           | Jira Database driver                                                                     | `org.postgresql.Driver`      |
+| `databaseConnection.type`                     | Jira database server type                                                                | `postgres72`                 |
+| `databaseConnection.schemaName`               | Database schema name (Note: it depends on the `databaseConnection.type` used)            | `public`                     |
+| `databaseDrop.enabled`                        | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
+| `databaseDrop.dropIt`                         | Confirm database removal if set to `yes`                                                 | `no`                         |
+
+### Deployment parameters
+
+| Parameter                            | Description                                                                               | Default                    |
+|--------------------------------------|-------------------------------------------------------------------------------------------|----------------------------|
+| `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                        |
+| `securityContext`                    | Container security context options                                                        | `{}`                       |
+| `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m` |
+| `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                       |
+| `tolerations`                        | List of node taints to tolerate                                                           | `[]`                       |
+| `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                       |
+| `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                       |
+| `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                       |
+| `extraVolumes`                       | Additional volumes to add to the pods                                                     | `[]`                       |
+| `schedulerName`                      | Use an alternate scheduler, eg. `stork`                                                   | `""`                       |
+| `readinessProbe`                     | Readiness probe values                                                                    | `{}`                       |
+| `readinessProbe.httpGet.path`        | Readiness probe HTTP GET request (Note: Jira handler is `/status`)                        | `nil`                      |
+| `readinessProbe.httpGet.port`        | Readiness probe port (Note: Jira listens on internal port 8080)                           | `nil`                      |
+| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated                                                 | `nil`                      |
+| `readinessProbe.periodSeconds`       | How often to perform the probe                                                            | `nil`                      |
+| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
+| `readinessProbe.timeoutSeconds`      | When the probe times out                                                                  | `nil`                      |
+| `livenessProbe`                      | Liveness probe values                                                                     | `{}`                       |
+| `livenessProbe.httpGet.path`         | Liveness probe HTTP GET request (Note: Jira handler is `/status`)                         | `nil`                      |
+| `livenessProbe.httpGet.port`         | Liveness probe port (Note: Jira listens on internal port 8080)                            | `nil`                      |
+| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated                                                  | `nil`                      |
+| `livenessProbe.periodSeconds`        | How often to perform the probe                                                            | `nil`                      |
+| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
+| `livenessProbe.timeoutSeconds`       | When the probe times out                                                                  | `nil`                      |
+
+### Persistence parameters
+
+| Parameter                   | Description                                                                   | Default         |
+|-----------------------------|-------------------------------------------------------------------------------|-----------------|
+| `persistence.enabled`       | Enable persistence using PVC                                                  | `true`          |
+| `persistence.existingClaim` | Provide an existing `PersistentVolumeClaim` for Jira, evaluated as a template | `""`            |
+| `persistence.accessModes`   | PVC Access Mode for Jira Software volume                                      | `ReadWriteOnce` |
+| `persistence.size`          | PVC Storage Request for Jira Software volume                                  | `10Gi`          |
+| `persistence.storageClass`  | PVC Storage Class for Jira Software volume                                    | `empty`         |
+
+### RBAC parameters
+
+| Parameter                    | Description                                           | Default |
+|------------------------------|-------------------------------------------------------|---------|
+| `serviceAccount.create`      | Specifies whether a service account should be created | `false` |
+| `serviceAccount.annotations` | Map of service account annotations                    | `{}`    |
+| `serviceAcccount.name`       | Name of existing service account                      | `""`    |
+
+### Exposure parameters
+
+| Parameter                   | Description                                                            | Default             |
+|-----------------------------|------------------------------------------------------------------------|---------------------|
+| `service.type`              | Kubernetes Service type                                                | `ClusterIP`         |
+| `service.port`              | Service HTTP port (Note: it must match with `envVars.ATL_TOMCAT_PORT`) | `8080`              |
+| `service.httpsPort`         | Service HTTPS port  (Note: needs `envVars.ATL_TOMCAT_SCHEME: https`)   | `empty`             |
+| `service.loadBalancer`      | Kubernetes LoadBalancerIP to request                                   | `empty`             |
+| `service.nodePorts.http`    | Kubernetes http node port                                              | `""`                |
+| `service.nodePorts.https`   | Kubernetes https node port                                             | `""`                |
+| `ingress.enabled`           | Enable ingress controller resource                                     | `false`             |
+| `ingress.annotations`       | Map of ingress annotations                                             | `{}`                |
+| `ingress.hosts[0].host`     | JIra Software installation hostname                                    | `jira-server.local` |
+| `ingress.hosts[0].paths`    | Path within the url structure                                          | `[]`                |
+| `ingress.tls`               | TLS options                                                            | `[]`                |
+| `ingress.tls[0].secretName` | TLS Secret (certificates)                                              | `nil`               |
+| `ingress.tls[0].hosts[0]`   | TLS hosts                                                              | `nil`               |
 
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+Each parameter can be specified during the Chart installation as follow:
 
 ```console
 $ helm install my-release \
@@ -203,7 +245,7 @@ $ helm install my-release \
 
 The above command sets the different parameters of the database connection.
 
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
+Alternatively, a YAML file can be provided to override the default `values.yaml`. For example:
 
 ```console
 $ helm install my-release -f values-production.yaml mox/jira-software
@@ -219,11 +261,11 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Version 0.3.4
-```console
+Version 0.3.5
+```diff
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
-@@ -58,7 +58,7 @@
+@@ -67,7 +67,7 @@
  ## Kubernetes svc configuration
  service:
    ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -232,7 +274,7 @@ Version 0.3.4
    ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
    ##
    ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
-@@ -98,10 +98,10 @@
+@@ -107,10 +107,10 @@
  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
  resources:
    requests:
@@ -246,16 +288,14 @@ Version 0.3.4
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -202,7 +202,7 @@
+@@ -211,7 +211,7 @@
    fullnameOverride: jira-software-db
  
    persistence:
 -    size: 8Gi
 +    size: 20Gi
  
-   initdbScriptsConfigMap: |-
-     {{ .Release.Name }}-db-helper-cm
-@@ -276,14 +276,14 @@
+@@ -285,12 +285,14 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
@@ -263,12 +303,12 @@ Version 0.3.4
 +envVars:
    #
    ## Memory / Heap Size (JVM_MINIMUM_MEMORY) Mandatory, see @Notes above
-   ## default: 1024m
--  # JVM_MINIMUM_MEMORY: 2048m
+-  # JVM_MINIMUM_MEMORY: 1024m
++  ## default: 1024m
 +  JVM_MINIMUM_MEMORY: 2048m
    ## Memory / Heap Size (JVM_MAXIMUM_MEMORY) Mandatory, see @Notes above
-   ## default: 1024m
--  # JVM_MAXIMUM_MEMORY: 2048m
+-  # JVM_MAXIMUM_MEMORY: 1024m
++  ## default: 1024m
 +  JVM_MAXIMUM_MEMORY: 2048m
    ## The reserved code cache size of the JVM
    # JVM_RESERVED_CODE_CACHE_SIZE: 512m
