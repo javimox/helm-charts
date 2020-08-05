@@ -17,10 +17,10 @@ $ helm install my-release mox/crowd
 This chart bootstraps a [Crowd server](https://hub.docker.com/r/atlassian/crowd/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 It is available on:
- * https://helm.mox.sh
- * https://hub.helm.sh/charts/mox/crowd
- * https://artifacthub.io/package/chart/mox/crowd
- * https://hub.kubeapps.com/charts/mox/crowd
+ * [helm.mox.sh](https://helm.mox.sh)
+ * [hub.helm.sh]( https://hub.helm.sh/charts/mox/crowd)
+ * [artifacthub.io](https://artifacthub.io/packages/helm/mox/crowd)
+ * [hub.kubeapps.com](https://hub.kubeapps.com/charts/mox/crowd)
 
 ## Prerequisites
 
