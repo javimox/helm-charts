@@ -55,6 +55,11 @@ if [ "${app_ver}" != "${app_new_ver}" ] ; then
     # replace tag version in values and values-production
     sed -i "0,/tag:/{s/tag:.*/tag: $app_new_ver/}" ${chart_dir}/{values.yaml,values-production.yaml}
 
+    # replace app version in README
+    line_nr=$(grep -n '```diff' ${chart_dir}/README.md | cut -f1 -d:)
+    line_nr=$(( line_nr - 1 ))
+    sed -i "${line_nr}s/.*/Chart Version ${chart_new_ver}/" ${chart_dir}/README.md
+
     # commit the changes
     git config user.name "$git_username"
     git config user.email "$git_email"
