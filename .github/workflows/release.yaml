@@ -34,6 +34,6 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Run chart-releaser
-        uses: moxbot/chart-releaser-action@v1.0.0-rc.2
+        uses: moxbot/chart-releaser-action@v1.0.0
         env:
           CR_TOKEN: "${{ secrets.CR_TOKEN }}"
