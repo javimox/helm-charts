@@ -78,6 +78,17 @@ Create a default fully qualified app name for the postgres requirement.
 {{- end -}}
 
 {{/*
+Return true if initContainers are needed
+*/}}
+{{- define "crowd.createInitContainer" -}}
+{{- if .Values.postgresql.enabled -}}
+    {{- true -}}
+{{- else if .Values.caCerts }}
+    {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Renders a value that contains template.
 Usage:
 {{ include "crowd.tplValue" ( dict "value" .Values.path.to.the.Value "context" $) }}
