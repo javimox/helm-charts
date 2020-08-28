@@ -20,8 +20,18 @@ spec:
         {{- . | toYaml | trim | nindent 8 }}
       {{- end }}
     spec:
-      {{- if .Values.caCerts }}
+      {{- if (include "jira-software.createInitContainer" .) }}
       initContainers:
+        {{- if .Values.postgresql.enabled }}
+        - name: init-postgres
+          image: postgres:9.6.11-alpine
+          imagePullPolicy: IfNotPresent
+          command: [
+            "sh",
+            "-c",
+            "until pg_isready -h {{ .Values.postgresql.fullnameOverride }} -p 5432 ; do echo waiting for {{ .Values.postgresql.fullnameOverride }}; sleep 5; done;"]
+        {{- end }}
+        {{- if .Values.caCerts }}
         - name: ca-certs
           image: adoptopenjdk:11-jdk-hotspot
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -44,6 +54,7 @@ spec:
           env:
             {{- . | toYaml | trim | nindent 12 }}
           {{- end }}
+        {{- end }}
       {{- end }}
     {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
