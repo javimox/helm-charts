@@ -46,4 +46,5 @@ jobs:
 
            [1]: https://github.com/javimox/javimox.github.io
         branch: update-helm-section
+        branch-suffix: timestamp
         labels: update-charts-readme
