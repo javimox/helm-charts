@@ -66,7 +66,7 @@ $ helm upgrade my-release
 
 Otherwise, see [Upgrade Jira software with PostgreSQL enabled](#upgrade-with-postgres-enabled) for more details.
 
-## PostgreSQL enabled
+## <a name="postgres-enabled"></a>PostgreSQL enabled
 
 This chart deploys **by default** a [bitnami PostgreSQL](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) instance.
 
@@ -77,14 +77,18 @@ PostgreSQL Chart from **bitnami** generates a random password if we do not speci
 To specify a password:
 ```console
 $ helm install my-release \
-     --set global.postgresql.postgresqlPassword=[POSTGRESQL_PASSWORD] \
-     --set global.postgresql.replicationPassword=[REPLICATION_PASSWORD] # in case Replication is enabled \
+     --set postgresql.postgresqlPassword=[POSTGRESQL_PASSWORD] \
+     --set postgresql.replication.password=[REPLICATION_PASSWORD] # in case Replication is enabled \
      mox/jira-software
 ```
 
 ### <a name="uninstall-with-postgres-enabled"></a>Uninstall Jira software with PostgreSQL enabled
 
-The Persistent Volume Claim (PVC) of postgres will **NOT** be automatically deleted. It needs to be removed manually.
+The Persistent Volume Claim (PVC) of postgres will **NOT** be automatically deleted. It needs to be removed manually:
+
+```console
+$ kubectl delete pvc -l app.kubernetes.io/instance=my-release
+```
 
 ### <a name="upgrade-with-postgres-enabled"></a>Upgrade Jira software with PostgreSQL enabled
 
@@ -147,10 +151,14 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 | `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
 | `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                      | `jira-software-db`           |
 | `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                | `8Gi`                        |
+| `postgresql.postgresqlPassword`               | PostgreSQL user password                                                                 | _random 10 character string_ |
 | `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
+| `postgresql.initdbScriptsSecret`              | Secret with initdb scripts that contain sensitive information                            | `nil`                        |
 | `databaseConnection.host`                     | Hostname of the database server                                                          | `jira-software-db`           |
 | `databaseConnection.user`                     | Jira database user                                                                       | `jirauser`                   |
 | `databaseConnection.password`                 | Jira database password                                                                   | `"CHANGEME"`                 |
+| `databaseConnection.existingSecret.name`      | Secret name that contains the database connection password                               | `nil`                        |
+| `databaseConnection.existingSecret.key`       | Secret key of database connection password                                               | `nil`                        |
 | `databaseConnection.database`                 | Jira database name                                                                       | `jiradb`                     |
 | `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
 | `databaseConnection.port`                     | Jira database server port                                                                | `5432`                       |
@@ -251,6 +259,82 @@ Alternatively, a YAML file can be provided to override the default `values.yaml`
 $ helm install my-release -f values-production.yaml mox/jira-software
 ```
 
+## <a name="use-existing-secrets"></a>Use existing secrets
+
+The password of the database user needs to be specified two times. If an external database is used, only the second point is relevant.  
+If the database is deployed along with the chart, then both passwords have to match.
+
+### 1. Deploy database
+
+This chart deploys [PostgreSQL](#postgres-enabled). It will create `databaseConnection.user` and `databaseConnection.database`, thus `databaseConnection.password` will be set.
+
+In this case, PostgreSQL chart Bitnami flavor provides the parameter `initdbScriptsSecret`, which can be used to change the default `databaseConnection.password`.
+
+Example with password: `test123`
+
+SQL Query that changes the default password for `databaseConnection.user`:
+```console
+$ echo "ALTER USER jirauser WITH PASSWORD 'test123';" | base64 
+QUxURVIgVVNFUiBqaXJhdXNlciBXSVRIIFBBU1NXT1JEICd0ZXN0MTIzJzsK
+```
+
+Secret that uses the SQL Query:
+```console
+$ cat alter-user-passwd.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alter-user-passwd
+data:
+  alter-passwd.sql: QUxURVIgVVNFUiBqaXJhdXNlciBXSVRIIFBBU1NXT1JEICd0ZXN0MTIzJzsK
+```
+
+Create the secret
+```console
+$ kubectl apply -f alter-user-passwd.yaml
+```
+
+### 2. Connect to the database
+
+This chart sets the required environment variables to configure the database connection (`databaseConnection`), avoiding the need to do so through the Jira installation.
+
+The parameters `databaseConnection.existingSecret.name` and `databaseConnection.existingSecret.key` are required if an existing secret contains the password to connect to the database.  
+In this case, `databaseConnection.password` will be then ignored.
+
+Example with password: `test123`
+
+Password:
+```console
+$ printf "test123" | base64
+dGVzdDEyMw==
+```
+
+Secret that contains the password:
+```console
+$ cat db-pw.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+data:
+  db-pw: "dGVzdDEyMw=="
+```
+
+Create the secret
+```console
+$ kubectl apply -f db-pw.yaml
+```
+
+### Install Chart using existing secrets
+
+```console
+$ helm install my-release \
+   --set postgresql.initdbScriptsSecret=alter-user-passwd \
+   --set databaseConnection.existingSecret.name=mysecret \
+   --set databaseConnection.existingSecret.key=db-pw \
+   mox/jira-software
+```
+
 ## <a name="remove-existing-database"></a>Remove existing database
 
 It is possible to remove an existing Jira database while deploying. Useful if, e.g. we are installing this Chart in a CI environment.
@@ -261,11 +345,11 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 0.3.7
+Chart Version 1.0.0
 ```diff
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
-@@ -67,7 +67,7 @@
+@@ -60,7 +60,7 @@
  ## Kubernetes svc configuration
  service:
    ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -274,7 +358,7 @@ Chart Version 0.3.7
    ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
    ##
    ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
-@@ -107,10 +107,10 @@
+@@ -100,10 +100,10 @@
  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
  resources:
    requests:
@@ -288,14 +372,16 @@ Chart Version 0.3.7
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -211,7 +211,7 @@
+@@ -204,7 +204,7 @@
    fullnameOverride: jira-software-db
  
    persistence:
 -    size: 8Gi
 +    size: 20Gi
  
-@@ -285,12 +285,14 @@
+   ## postgres user password (needed when upgrading Chart)
+   ## generate random 10 character alphanumeric string if left empty
+@@ -294,12 +294,14 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
@@ -314,6 +400,14 @@ Chart Version 0.3.7
    # JVM_RESERVED_CODE_CACHE_SIZE: 512m
    #
 ```
+
+## Changelog
+
+**v1.0.0**
+* After 17 releases of the Jira Software Chart it became stable enough to jump to v1.0
+* Recent changes:
+  - Jira waits for postgres readiness (#e5a0861)
+  - Add support to existing secrets
 
 ## Links
 
