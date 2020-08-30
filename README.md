@@ -24,15 +24,15 @@ Helm Charts of `mox` repository are available on:
 
 ## Chart Sources
 
-* `charts/confluence-server`: Atlassian Confluence Server chart @ [helm.mox.sh](https://mox.sh/helm/charts/confluence-server/)
-* `charts/crowd`: Atlassian Crowd chart @ [helm.mox.sh](https://mox.sh/helm/charts/crowd/)
-* `charts/jira-software`: Jira Software chart @ [helm.mox.sh](https://mox.sh/helm/charts/jira-software/)
+* `[charts/confluence-server]`: Atlassian Confluence Server chart. [mox.sh](https://mox.sh/helm/charts/confluence-server/) [github.com](https://github.com/javimox/helm-charts/tree/master/charts/confluence-server)
+* `[charts/crowd]`: Atlassian Crowd chart. [mox.sh](https://mox.sh/helm/charts/crowd/) [github.com](https://github.com/javimox/helm-charts/tree/master/charts/crowd)
+* `[charts/jira-software]`: Jira Software chart. [mox.sh](https://mox.sh/helm/charts/jira-software/) [github.com](https://github.com/javimox/helm-charts/tree/master/charts/jira-software)
 
 ## Contribute
 
 Contributions are welcome! If you have any issue deploying these charts or a enhancement feature, feel free to open an issue on [my GitHub](https://github.com/javimox/helm-charts/tree/master).
 
-If you want to add your Charts to the **mox** repository, you are welcome to:
+If you want to add your Charts to the **mox** repository or modify those that are available, you are welcome to:
 
 * Fork this repository
 * Create a branch off master named after your chart
