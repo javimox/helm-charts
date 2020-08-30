@@ -66,7 +66,7 @@ $ helm upgrade my-release
 
 Otherwise, see [Upgrade Confluence server with PostgreSQL enabled](#upgrade-with-postgres-enabled) for more details.
 
-## PostgreSQL enabled
+## <a name="postgres-enabled"></a> PostgreSQL enabled
 
 This chart deploys **by default** a [bitnami PostgreSQL](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) instance.
 
