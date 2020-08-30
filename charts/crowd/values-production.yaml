@@ -210,7 +210,7 @@ postgresql:
   ## Creates 'databaseConnection.user' and '.database'
   initdbScriptsConfigMap: |-
     {{ .Release.Name }}-db-helper-cm
-  
+
   ## Use existing secret to set the password for 'databaseConnection.user' in postgres
   ## https://github.com/javimox/helm-charts/tree/master/charts/crowd#use-existing-secrets
   ## https://github.com/bitnami/charts/tree/master/bitnami/postgresql#initialize-a-fresh-instance
