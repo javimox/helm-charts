@@ -7,13 +7,6 @@
 # @Notes
 # We must set resources requests and limits for preventing OOM killer
 
-## Global overrides PostgreSQL passwords.
-## Only if postgresql.enabled is set to 'true'.
-global:
-  postgresql: {}
-  # postgresqlPassword: ""
-  # replicationPassword: ""
-
 ## Atlassian Confluence image version
 ## ref: https://hub.docker.com/r/atlassian/confluence-server
 image:
@@ -212,8 +205,8 @@ livenessProbe: {}
 #  timeoutSeconds: 10
 
 ##
-## Postgresql chart configuration
-## https://github.com/helm/charts/blob/master/stable/postgresql/values.yaml
+## Deploy PostgreSQL. If you are using an external DB, disable this.
+## https://github.com/bitnami/charts/tree/master/bitnami/postgresql#parameters
 ##
 postgresql:
   ## Whether to deploy a postgres server to satisfy the applications database requirements.
@@ -227,15 +220,26 @@ postgresql:
 
   fullnameOverride: confluence-server-db
 
-  # persistence:
-  #   size: 8Gi
+  persistence:
+    size: 20Gi
 
+  ## postgres user password (needed when upgrading Chart)
+  ## generate random 10 character alphanumeric string if left empty
+  postgresqlPassword: ""
+
+  ## Creates 'databaseConnection.user' and '.database'
   initdbScriptsConfigMap: |-
     {{ .Release.Name }}-db-helper-cm
+  
+  ## Use existing secret to set the password for 'databaseConnection.user' in postgres
+  ## https://github.com/javimox/helm-charts/tree/master/charts/confluence-server#use-existing-secrets
+  ## https://github.com/bitnami/charts/tree/master/bitnami/postgresql#initialize-a-fresh-instance
+  ##
+  # initdbScriptsSecret: alter-user-passwd
 
 ##
+## Database connection information
 ## If postgresql is enabled and no database exists, it will be created (see db-helper ConfigMap)
-## password will be send to externaldb-secrets
 ##
 databaseConnection:
   ## Database host
@@ -246,6 +250,11 @@ databaseConnection:
 
   ## Database password. CHANGE IT :)
   password: "CHANGEME"
+
+  ## Or specify a secret name. databaseConnection.password will be then ignored
+  existingSecret: {}
+  #  name: mysecret
+  #  key: db-pw
 
   ## Database name
   database: confluencedb

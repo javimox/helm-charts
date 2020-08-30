@@ -85,6 +85,42 @@ Create a default fully qualified app name for the postgres requirement.
 {{- end -}}
 
 {{/*
+Renders a value that contains template.
+Usage:
+{{ include "confluence-server.tplValue" ( dict "value" .Values.path.to.the.Value "context" $) }}
+*/}}
+{{- define "confluence-server.tplValue" -}}
+    {{- if typeIs "string" .value }}
+        {{- tpl .value .context }}
+    {{- else }}
+        {{- tpl (.value | toYaml) .context }}
+    {{- end }}
+{{- end -}}
+
+{{/*
+Return postgres secret name used in NOTES
+*/}}
+{{- define "postgresql.secretNameNotes" -}}
+{{- if .Values.postgresql.enabled -}}
+  {{- if .Values.postgresql.fullnameOverride -}}
+    {{- printf "%s" (tpl .Values.postgresql.fullnameOverride $) -}}
+  {{- else -}}
+    {{- printf "%s" (include "confluence-server.fullname" .) -}}
+  {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if a secret object should be created
+*/}}
+{{- define "confluence-server.createSecret" -}}
+{{- if .Values.databaseConnection.existingSecret -}}
+{{- else -}}
+    {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Return true if initContainers are needed
 */}}
 {{- define "confluence-server.createInitContainer" -}}
@@ -96,14 +132,23 @@ Return true if initContainers are needed
 {{- end -}}
 
 {{/*
-Renders a value that contains template.
-Usage:
-{{ include "confluence-server.tplValue" ( dict "value" .Values.path.to.the.Value "context" $) }}
+Get the secret name
 */}}
-{{- define "confluence-server.tplValue" -}}
-    {{- if typeIs "string" .value }}
-        {{- tpl .value .context }}
-    {{- else }}
-        {{- tpl (.value | toYaml) .context }}
-    {{- end }}
+{{- define "confluence-server.secretName" -}}
+{{- if .Values.databaseConnection.existingSecret.name -}}
+    {{- printf "%s" (tpl .Values.databaseConnection.existingSecret.name $) -}}
+{{- else -}}
+    {{- printf "%s" (include "confluence-server.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Get the secret key
+*/}}
+{{- define "confluence-server.secretKey" -}}
+{{- if .Values.databaseConnection.existingSecret.key -}}
+    {{- printf "%s" (tpl .Values.databaseConnection.existingSecret.key $) -}}
+{{- else -}}
+    {{- printf "ATL_JDBC_PASSWORD" -}}
+{{- end -}}
 {{- end -}}

@@ -10,7 +10,6 @@ data:
   {{- end }}
   ATL_JDBC_URL: "jdbc:{{ .Values.databaseConnection.type }}://{{ .Values.databaseConnection.host }}:{{ .Values.databaseConnection.port }}/{{ .Values.databaseConnection.database }}"
   ATL_JDBC_USER: "{{ .Values.databaseConnection.user }}"
-  ATL_JDBC_PASSWORD: {{ .Values.databaseConnection.password | quote }}
   ATL_DB_TYPE: "{{ .Values.databaseConnection.type }}"
   {{- if .Values.ingress.enabled }}
   ATL_PROXY_NAME: {{ (index .Values.ingress.hosts 0).host | quote }}
