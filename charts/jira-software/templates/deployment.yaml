@@ -78,6 +78,11 @@ spec:
             - configMapRef:
                 name: {{ include "jira-software.fullname" . }}-cm
           env:
+            - name: ATL_JDBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "jira-software.secretName" . }}
+                  key: {{ template "jira-software.secretKey" . }}
             - name: JVM_SUPPORT_RECOMMENDED_ARGS
               value: "{{ default "" .Values.extraEnv }}\
                 {{ if .Values.caCerts }} -Djavax.net.ssl.trustStore=/var/atlassian/application-data/jira/cacerts {{ end }}"

@@ -69,7 +69,7 @@ Otherwise, see [Upgrade Crowd server with PostgreSQL enabled](#upgrade-with-post
 The values `databaseConnection.*` are **only** used to create a user and a database for Crowd if PostgreSQL is enabled.
 During the Setup Wizard is still necessary to configure the database connection, as no connection URL is documented [here](https://hub.docker.com/r/atlassian/crowd).
 
-## PostgreSQL enabled
+## <a name="postgres-enabled"></a>PostgreSQL enabled
 
 This chart deploys **by default** a [bitnami PostgreSQL](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) instance.
 
@@ -80,14 +80,18 @@ PostgreSQL Chart from **bitnami** generates a random password if we do not speci
 To specify a password:
 ```console
 $ helm install my-release \
-     --set global.postgresql.postgresqlPassword=[POSTGRESQL_PASSWORD] \
-     --set global.postgresql.replicationPassword=[REPLICATION_PASSWORD] # in case Replication is enabled \
+     --set postgresql.postgresqlPassword=[POSTGRESQL_PASSWORD] \
+     --set postgresql.replication.password=[REPLICATION_PASSWORD] # in case Replication is enabled \
      mox/crowd
 ```
 
 ### <a name="uninstall-with-postgres-enabled"></a>Uninstall Crowd server with PostgreSQL enabled
 
-The Persistent Volume Claim (PVC) of postgres will **NOT** be automatically deleted. It needs to be removed manually.
+The Persistent Volume Claim (PVC) of postgres will **NOT** be automatically deleted. It needs to be removed manually:
+
+```console
+$ kubectl delete pvc -l app.kubernetes.io/instance=my-release
+```
 
 ### <a name="upgrade-with-postgres-enabled"></a>Upgrade Crowd server with PostgreSQL enabled
 
@@ -150,10 +154,14 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 | `postgresql.image.pullPolicy`                 | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
 | `postgresql.fullnameOverride`                 | String to fully override postgresql.fullname template with a string                      | `crowd-db`                   |
 | `postgresql.persistence.size`                 | PVC Storage Request for PostgreSQL volume                                                | `8Gi`                        |
+| `postgresql.postgresqlPassword`               | PostgreSQL user password                                                                 | _random 10 character string_ |
 | `postgresql.initdbScriptsConfigMap`           | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
+| `postgresql.initdbScriptsSecret`              | Secret with initdb scripts that contain sensitive information                            | `nil`                        |
 | `databaseConnection.host`                     | Hostname of the database server. See [Database connection](#database-connection)         | `crowd-db`                   |
 | `databaseConnection.user`                     | Crowd database user. See [Database connection](#database-connection)                     | `crowduser`                  |
 | `databaseConnection.password`                 | Crowd database password.See [Database connection](#database-connection)                  | `"CHANGEME"`                 |
+| `databaseConnection.existingSecret.name`      | Secret name that contains the database connection password                               | `nil`                        |
+| `databaseConnection.existingSecret.key`       | Secret key of database connection password                                               | `nil`                        |
 | `databaseConnection.database`                 | Crowd database name. See [Database connection](#database-connection)                     | `crowddb`                    |
 | `databaseConnection.lang`                     | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
 | `databaseDrop.enabled`                        | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
@@ -245,6 +253,82 @@ Alternatively, a YAML file can be provided to override the default `values.yaml`
 $ helm install my-release -f values-production.yaml mox/crowd
 ```
 
+## <a name="use-existing-secrets"></a>Use existing secrets
+
+The password of the database user needs to be specified two times. If an external database is used, only the second point is relevant.  
+If the database is deployed along with the chart, then both passwords have to match.
+
+### 1. Deploy database
+
+This chart deploys [PostgreSQL](#postgres-enabled). It will create `databaseConnection.user` and `databaseConnection.database`, thus `databaseConnection.password` will be set.
+
+In this case, PostgreSQL chart Bitnami flavor provides the parameter `initdbScriptsSecret`, which can be used to change the default `databaseConnection.password`.
+
+Example with password: `test123`
+
+SQL Query that changes the default password for `databaseConnection.user`:
+```console
+$ echo "ALTER USER crowduser WITH PASSWORD 'test123';" | base64 
+QUxURVIgVVNFUiBjcm93ZHVzZXIgV0lUSCBQQVNTV09SRCAndGVzdDEyMyc7Cg==
+```
+
+Secret that uses the SQL Query:
+```console
+$ cat alter-user-passwd.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alter-user-passwd
+data:
+  alter-passwd.sql: QUxURVIgVVNFUiBjcm93ZHVzZXIgV0lUSCBQQVNTV09SRCAndGVzdDEyMyc7Cg==
+```
+
+Create the secret
+```console
+$ kubectl apply -f alter-user-passwd.yaml
+```
+
+### 2. Connect to the database
+
+This chart sets the required environment variables to configure the database connection (`databaseConnection`). It is still necessary to enter the values during the installation of Crowd. See [Database connection](#database-connection).
+
+The parameters `databaseConnection.existingSecret.name` and `databaseConnection.existingSecret.key` are required if an existing secret contains the password to connect to the database.  
+In this case, `databaseConnection.password` will be then ignored.
+
+Example with password: `test123`
+
+Password:
+```console
+$ printf "test123" | base64
+dGVzdDEyMw==
+```
+
+Secret that contains the password:
+```console
+$ cat db-pw.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+data:
+  db-pw: "dGVzdDEyMw=="
+```
+
+Create the secret
+```console
+$ kubectl apply -f db-pw.yaml
+```
+
+### Install Chart using existing secrets
+
+```console
+$ helm install my-release \
+   --set postgresql.initdbScriptsSecret=alter-user-passwd \
+   --set databaseConnection.existingSecret.name=mysecret \
+   --set databaseConnection.existingSecret.key=db-pw \
+   mox/crowd
+```
+
 ## <a name="remove-existing-database"></a>Remove existing database
 
 It is possible to remove an existing Crowd database while deploying. Useful if, e.g. we are installing this Chart in a CI environment.
@@ -262,11 +346,20 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 0.1.2
+Chart Version 1.0.0
 ```diff
 --- crowd/values.yaml
 +++ crowd/values-production.yaml
-@@ -261,11 +261,11 @@
+@@ -201,7 +201,7 @@
+   fullnameOverride: crowd-db
+ 
+   persistence:
+-    size: 8Gi
++    size: 10Gi
+ 
+   ## postgres user password (needed when upgrading Chart)
+   ## generate random 10 character alphanumeric string if left empty
+@@ -270,11 +270,11 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
@@ -282,6 +375,13 @@ Chart Version 0.1.2
    ## Tomcat and Reverse Proxy Settings
    ## Crowd running behind a reverse proxy server options
 ```
+
+## Changelog
+
+**v1.0.0**
+* Recent changes:
+  - Crowd waits for postgres readiness (#42c246d)
+  - Add support to existing secrets
 
 ## Links
 

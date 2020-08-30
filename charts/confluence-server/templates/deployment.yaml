@@ -78,6 +78,11 @@ spec:
             - configMapRef:
                 name: {{ include "confluence-server.fullname" . }}-cm
           env:
+            - name: ATL_JDBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "confluence-server.secretName" . }}
+                  key: {{ template "confluence-server.secretKey" . }}
             - name: JVM_SUPPORT_RECOMMENDED_ARGS
               value: "{{ default "" .Values.extraEnv }}\
                 {{ if .Values.caCerts }} -Djavax.net.ssl.trustStore=/var/atlassian/application-data/confluence/cacerts {{ end }}"

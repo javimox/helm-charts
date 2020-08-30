@@ -66,7 +66,7 @@ $ helm upgrade my-release
 
 Otherwise, see [Upgrade Confluence server with PostgreSQL enabled](#upgrade-with-postgres-enabled) for more details.
 
-## PostgreSQL enabled
+## <a name="postgres-enabled"></a> PostgreSQL enabled
 
 This chart deploys **by default** a [bitnami PostgreSQL](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) instance.
 
@@ -77,14 +77,18 @@ PostgreSQL Chart from **bitnami** generates a random password if we do not speci
 To specify a password:
 ```console
 $ helm install my-release \
-     --set global.postgresql.postgresqlPassword=[POSTGRESQL_PASSWORD] \
-     --set global.postgresql.replicationPassword=[REPLICATION_PASSWORD] # in case Replication is enabled \
+     --set postgresql.postgresqlPassword=[POSTGRESQL_PASSWORD] \
+     --set postgresql.replication.password=[REPLICATION_PASSWORD] # in case Replication is enabled \
      mox/confluence-server
 ```
 
 ### <a name="uninstall-with-postgres-enabled"></a>Uninstall Confluence server with PostgreSQL enabled
 
-The Persistent Volume Claim (PVC) of postgres will **NOT** be automatically deleted. It needs to be removed manually.
+The Persistent Volume Claim (PVC) of postgres will **NOT** be automatically deleted. It needs to be removed manually:
+
+```console
+$ kubectl delete pvc -l app.kubernetes.io/instance=my-release
+```
 
 ### <a name="upgrade-with-postgres-enabled"></a>Upgrade Confluence server with PostgreSQL enabled
 
@@ -138,25 +142,29 @@ The following tables lists the configurable parameters of the Confluence Server 
 Confluence requires a database. It can be either deployed as dependency using PostgreSQL subchart or configured a database connection to an external server.
 By default a PostgreSQL will be deployed and a user and a database will be created using the `databaseConnection` values.
 
-|  Parameter                           | Description                                                                              | Default                      |
-|--------------------------------------|------------------------------------------------------------------------------------------|------------------------------|
-| `postgresql.enabled`                 | Whether to use the PostgreSQL chart                                                      | `true`                       |
-| `postgresql.image.registry`          | PostgreSQL image registry                                                                | `docker.io`                  |
-| `postgresql.image.repository`        | PostgreSQL image repository                                                              | `bitnami/postgresql`         |
-| `postgresql.image.tag`               | PostgreSQL image tag                                                                     | `10`                         |
-| `postgresql.image.pullPolicy`        | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
-| `postgresql.fullnameOverride`        | String to fully override postgresql.fullname template with a string                      | `confluence-server-db`       |
-| `postgresql.persistence.size`        | PVC Storage Request for PostgreSQL volume                                                | `nil`                        |
-| `postgresql.initdbScriptsConfigMap`  | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
-| `databaseConnection.host`            | Hostname of the database server                                                          | `confluence-server-db`       |
-| `databaseConnection.user`            | Confluence database user                                                                 | `confluenceuser`             |
-| `databaseConnection.password`        | Confluence database password                                                             | `"CHANGEME"`                 |
-| `databaseConnection.database`        | Confluence database name                                                                 | `confluencedb`               |
-| `databaseConnection.lang`            | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
-| `databaseConnection.port`            | Confluence database server port                                                          | `5432`                       |
-| `databaseConnection.type`            | Confluence database server type                                                          | `postgresql`                 |
-| `databaseDrop.enabled`               | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
-| `databaseDrop.dropIt`                | Confirm database removal if set to `yes`                                                 | `no`                         |
+|  Parameter                               | Description                                                                              | Default                      |
+|------------------------------------------|------------------------------------------------------------------------------------------|------------------------------|
+| `postgresql.enabled`                     | Whether to use the PostgreSQL chart                                                      | `true`                       |
+| `postgresql.image.registry`              | PostgreSQL image registry                                                                | `docker.io`                  |
+| `postgresql.image.repository`            | PostgreSQL image repository                                                              | `bitnami/postgresql`         |
+| `postgresql.image.tag`                   | PostgreSQL image tag                                                                     | `10`                         |
+| `postgresql.image.pullPolicy`            | PostgreSQL image pull policy                                                             | `IfNotPresent`               |
+| `postgresql.fullnameOverride`            | String to fully override postgresql.fullname template with a string                      | `confluence-server-db`       |
+| `postgresql.persistence.size`            | PVC Storage Request for PostgreSQL volume                                                | `nil`                        |
+| `postgresql.postgresqlPassword`          | PostgreSQL user password                                                                 | _random 10 character string_ |
+| `postgresql.initdbScriptsConfigMap`      | ConfigMap with the initdb scripts (Note: Overrides initdbScripts), evaluated as template | `.Release.Name.db-helper-cm` |
+| `postgresql.initdbScriptsSecret`         | Secret with initdb scripts that contain sensitive information                            | `nil`                        |
+| `databaseConnection.host`                | Hostname of the database server                                                          | `confluence-server-db`       |
+| `databaseConnection.user`                | Confluence database user                                                                 | `confluenceuser`             |
+| `databaseConnection.password`            | Confluence database password                                                             | `"CHANGEME"`                 |
+| `databaseConnection.existingSecret.name` | Secret name that contains the database connection password                               | `nil`                        |
+| `databaseConnection.existingSecret.key`  | Secret key of database connection password                                               | `nil`                        |
+| `databaseConnection.database`            | Confluence database name                                                                 | `confluencedb`               |
+| `databaseConnection.lang`                | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
+| `databaseConnection.port`                | Confluence database server port                                                          | `5432`                       |
+| `databaseConnection.type`                | Confluence database server type                                                          | `postgresql`                 |
+| `databaseDrop.enabled`                   | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
+| `databaseDrop.dropIt`                    | Confirm database removal if set to `yes`                                                 | `no`                         |
 
 ### Deployment parameters
 
@@ -250,6 +258,82 @@ Alternatively, a YAML file can be provided to override the default `values.yaml`
 $ helm install my-release -f values-production.yaml mox/confluence-server
 ```
 
+## <a name="use-existing-secrets"></a>Use existing secrets
+
+The password of the database user needs to be specified two times. If an external database is used, only the second point is relevant.  
+If the database is deployed along with the chart, then both passwords have to match.
+
+### 1. Deploy database
+
+This chart deploys [PostgreSQL](#postgres-enabled). It will create `databaseConnection.user` and `databaseConnection.database`, thus `databaseConnection.password` will be set.
+
+In this case, PostgreSQL chart Bitnami flavor provides the parameter `initdbScriptsSecret`, which can be used to change the default `databaseConnection.password`.
+
+Example with password: `test123`
+
+SQL Query that changes the default password for `databaseConnection.user`:
+```console
+$ echo "ALTER USER confluenceuser WITH PASSWORD 'test123';" | base64 
+QUxURVIgVVNFUiBjb25mbHVlbmNldXNlciBXSVRIIFBBU1NXT1JEICd0ZXN0MTIzJzsK
+```
+
+Secret that uses the SQL Query:
+```console
+$ cat alter-user-passwd.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alter-user-passwd
+data:
+  alter-passwd.sql: QUxURVIgVVNFUiBjb25mbHVlbmNldXNlciBXSVRIIFBBU1NXT1JEICd0ZXN0MTIzJzsK
+```
+
+Create the secret
+```console
+$ kubectl apply -f alter-user-passwd.yaml
+```
+
+### 2. Connect to the database
+
+This chart sets the required environment variables to configure the database connection (`databaseConnection`), avoiding the need to do so through Confluence installation.
+
+The parameters `databaseConnection.existingSecret.name` and `databaseConnection.existingSecret.key` are required if an existing secret contains the password to connect to the database.  
+In this case, `databaseConnection.password` will be then ignored.
+
+Example with password: `test123`
+
+Password:
+```console
+$ printf "test123" | base64
+dGVzdDEyMw==
+```
+
+Secret that contains the password:
+```console
+$ cat db-pw.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+data:
+  db-pw: "dGVzdDEyMw=="
+```
+
+Create the secret
+```console
+$ kubectl apply -f db-pw.yaml
+```
+
+### Install Chart using existing secrets
+
+```console
+$ helm install my-release \
+   --set postgresql.initdbScriptsSecret=alter-user-passwd \
+   --set databaseConnection.existingSecret.name=mysecret \
+   --set databaseConnection.existingSecret.key=db-pw \
+   mox/confluence-server
+```
+
 ## <a name="remove-existing-database"></a>Remove existing database
 
 It is possible to remove an existing Confluence database while deploying. Useful if, e.g. we are installing this Chart in a CI environment.
@@ -267,11 +351,11 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 0.3.6
+Chart Version 1.0.0
 ```diff
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
-@@ -67,7 +67,7 @@
+@@ -60,7 +60,7 @@
  ## Kubernetes svc configuration
  service:
    ## For minikube, set this to NodePort, elsewhere use LoadBalancer
@@ -280,7 +364,7 @@ Chart Version 0.3.6
    ## Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
    ##
    ## Avoid removing the http connector, as the Synchrony proxy health check, still requires HTTP
-@@ -107,10 +107,10 @@
+@@ -100,10 +100,10 @@
  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
  resources:
    requests:
@@ -294,7 +378,7 @@ Chart Version 0.3.6
  
  ## Replication (without ReplicaSet)
  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-@@ -154,11 +154,11 @@
+@@ -147,11 +147,11 @@
  ## Persistent Volume CLaim
  ## Confluence Attachments directory
  mountAttachments:
@@ -308,16 +392,16 @@ Chart Version 0.3.6
  
    ## If defined, storageClassName: <storageClass>
    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-@@ -227,8 +227,8 @@
- 
+@@ -221,7 +221,7 @@
    fullnameOverride: confluence-server-db
  
--  persistence:
+   persistence:
 -    size: 8Gi
-+  # persistence:
-+  #   size: 8Gi
++    size: 20Gi
  
-@@ -281,11 +281,13 @@
+   ## postgres user password (needed when upgrading Chart)
+   ## generate random 10 character alphanumeric string if left empty
+@@ -290,11 +290,13 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
@@ -335,6 +419,14 @@ Chart Version 0.3.6
    ## Tomcat and Reverse Proxy Settings
    ## Confluence running behind a reverse proxy server options
 ```
+
+## Changelog
+
+**v1.0.0**
+* After 22 releases of Confluence Server Chart it became stable enough to jump to v1.0
+* Recent changes:
+  - Confluence waits for postgres readiness (#4333d71)
+  - Add support to existing secrets
 
 ## Links
 
