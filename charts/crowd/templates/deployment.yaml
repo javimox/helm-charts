@@ -78,6 +78,11 @@ spec:
             - configMapRef:
                 name: {{ include "crowd.fullname" . }}-cm
           env:
+            - name: ATL_JDBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "crowd.secretName" . }}
+                  key: {{ template "crowd.secretKey" . }}
             - name: JVM_SUPPORT_RECOMMENDED_ARGS
               value: "{{ default "" .Values.extraEnv }}\
                 {{ if .Values.caCerts }} -Djavax.net.ssl.trustStore=/var/atlassian/application-data/crowd/cacerts {{ end }}"
