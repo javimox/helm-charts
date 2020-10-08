@@ -345,7 +345,7 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 1.0.2
+Chart Version 1.0.3
 ```diff
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
