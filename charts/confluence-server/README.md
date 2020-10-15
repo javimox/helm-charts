@@ -168,32 +168,34 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 
 ### Deployment parameters
 
-| Parameter                            | Description                                                                               | Default                    |
-|--------------------------------------|-------------------------------------------------------------------------------------------|----------------------------|
-| `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                        |
-| `securityContext`                    | Container security context options                                                        | `{}`                       |
-| `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m` |
-| `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                       |
-| `tolerations`                        | List of node taints to tolerate                                                           | `[]`                       |
-| `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                       |
-| `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                       |
-| `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                       |
-| `extraVolumes`                       | Additional volumes to add to the pods                                                     | `[]`                       |
-| `schedulerName`                      | Use an alternate scheduler, eg. `stork`                                                   | `""`                       |
-| `readinessProbe`                     | Readiness probe values                                                                    | `{}`                       |
-| `readinessProbe.httpGet.path`        | Readiness probe HTTP GET request (Note: Confluence handler is `/status`)                  | `nil`                      |
-| `readinessProbe.httpGet.port`        | Readiness probe port (Note: Confluence listens on internal port 8090)                     | `nil`                      |
-| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated                                                 | `nil`                      |
-| `readinessProbe.periodSeconds`       | How often to perform the probe                                                            | `nil`                      |
-| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
-| `readinessProbe.timeoutSeconds`      | When the probe times out                                                                  | `nil`                      |
-| `livenessProbe`                      | Liveness probe values                                                                     | `{}`                       |
-| `livenessProbe.httpGet.path`         | Liveness probe HTTP GET request (Note: Confluence handler is `/status`)                   | `nil`                      |
-| `livenessProbe.httpGet.port`         | Liveness probe port (Note: Confluence listens on internal port 8090)                      | `nil`                      |
-| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated                                                  | `nil`                      |
-| `livenessProbe.periodSeconds`        | How often to perform the probe                                                            | `nil`                      |
-| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                      |
-| `livenessProbe.timeoutSeconds`       | When the probe times out                                                                  | `nil`                      |
+| Parameter                            | Description                                                                               | Default                       |
+|--------------------------------------|-------------------------------------------------------------------------------------------|-------------------------------|
+| `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                           |
+| `securityContext`                    | Container security context options                                                        | `{}`                          |
+| `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m`    |
+| `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                          |
+| `tolerations`                        | List of node taints to tolerate                                                           | `[]`                          |
+| `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                          |
+| `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                          |
+| `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                          |
+| `extraVolumes`                       | Additional volumes to add to the pods                                                     | `[]`                          |
+| `schedulerName`                      | Use an alternate scheduler, eg. `stork`                                                   | `""`                          |
+| `readinessProbe`                     | Readiness probe values                                                                    | `{}`                          |
+| `readinessProbe.httpGet.path`        | Readiness probe HTTP GET request (Note: Confluence handler is `/status`)                  | `nil`                         |
+| `readinessProbe.httpGet.port`        | Readiness probe port (Note: Confluence listens on internal port 8090)                     | `nil`                         |
+| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated                                                 | `nil`                         |
+| `readinessProbe.periodSeconds`       | How often to perform the probe                                                            | `nil`                         |
+| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                         |
+| `readinessProbe.timeoutSeconds`      | When the probe times out                                                                  | `nil`                         |
+| `livenessProbe`                      | Liveness probe values                                                                     | `{}`                          |
+| `livenessProbe.httpGet.path`         | Liveness probe HTTP GET request (Note: Confluence handler is `/status`)                   | `nil`                         |
+| `livenessProbe.httpGet.port`         | Liveness probe port (Note: Confluence listens on internal port 8090)                      | `nil`                         |
+| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated                                                  | `nil`                         |
+| `livenessProbe.periodSeconds`        | How often to perform the probe                                                            | `nil`                         |
+| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe to be considered failed after having succeeded | `nil`                         |
+| `livenessProbe.timeoutSeconds`       | When the probe times out                                                                  | `nil`                         |
+| `initContainerImages.jdk`            | Image used in the init container when `caCerts` is enabled. Requires `keytool`            | `adoptopenjdk:11-jdk-hotspot` |
+| `initContainerImages.postgres`       | Image used in the init container when `postgresql` is enabled. Requires `pg_isready`      | `postgres:9.6.11-alpine`      |
 
 ### Persistence parameters
 
@@ -351,7 +353,7 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 1.0.4
+Chart Version 2.0.0
 ```diff
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
@@ -392,7 +394,7 @@ Chart Version 1.0.4
  
    ## If defined, storageClassName: <storageClass>
    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-@@ -221,7 +221,7 @@
+@@ -228,7 +228,7 @@
    fullnameOverride: confluence-server-db
  
    persistence:
@@ -401,7 +403,7 @@ Chart Version 1.0.4
  
    ## postgres user password (needed when upgrading Chart)
    ## generate random 10 character alphanumeric string if left empty
-@@ -290,11 +290,13 @@
+@@ -297,11 +297,13 @@
  #
  ## Environment Variables that will be injected in the ConfigMap
  ## Default values unless otherwise stated
@@ -427,6 +429,9 @@ Chart Version 1.0.4
 * Recent changes:
   - Confluence waits for postgres readiness (#4333d71)
   - Add support to existing secrets
+
+**v2.0.0**
+* Support to change init container images in values
 
 ## Links
 
