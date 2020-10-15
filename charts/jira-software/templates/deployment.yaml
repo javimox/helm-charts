@@ -24,7 +24,7 @@ spec:
       initContainers:
         {{- if .Values.postgresql.enabled }}
         - name: init-postgres
-          image: postgres:9.6.11-alpine
+          image: {{ .Values.initContainerImages.postgres | quote }}
           imagePullPolicy: IfNotPresent
           command: [
             "sh",
@@ -33,7 +33,7 @@ spec:
         {{- end }}
         {{- if .Values.caCerts }}
         - name: ca-certs
-          image: adoptopenjdk:11-jdk-hotspot
+          image: {{ .Values.initContainerImages.jdk | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - /bin/sh
