@@ -353,7 +353,7 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 2.0.0
+Chart Version 2.0.1
 ```diff
 --- confluence-server/values.yaml
 +++ confluence-server/values-production.yaml
