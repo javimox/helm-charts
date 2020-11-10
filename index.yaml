@@ -2,6 +2,39 @@ apiVersion: v1
 entries:
   confluence-server:
   - apiVersion: v2
+    appVersion: 7.9.0
+    created: "2020-11-10T08:02:41.016510718Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Wiki collaboration platform
+    digest: 09f61ff6ca20e7d08d0d801647f965297ada8c5fe6af4f3f4afb0a524a4e0f49
+    home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+    icon: https://mox.sh/assets/images/confluence-logo.png
+    keywords:
+    - wiki
+    - confluence
+    - confluence-server
+    - atlassian
+    - documentation
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: confluence-server
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/confluence-server
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/confluence-server-2.0.2/confluence-server-2.0.2.tgz
+    version: 2.0.2
+  - apiVersion: v2
     appVersion: 7.8.3
     created: "2020-11-03T08:02:30.910692877Z"
     dependencies:
