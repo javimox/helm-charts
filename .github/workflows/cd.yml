@@ -60,7 +60,7 @@ jobs:
 
     - name: Create Pull Request
       id: cpr
-      uses: moxbot/create-pull-request@v2
+      uses: moxbot/create-pull-request@v3
       with:
         token: ${{ secrets.CR_TOKEN }}
         commit-message: "[Release] update Charts with the latest stable App versions"
