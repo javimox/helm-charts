@@ -32,7 +32,7 @@ jobs:
 
     - name: Create PR
       id: cpr
-      uses: moxbot/create-pull-request@v2
+      uses: moxbot/create-pull-request@v3
       with:
         token: ${{ secrets.WWW_PAT }}
         path: "website/"
