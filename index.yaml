@@ -2,6 +2,39 @@ apiVersion: v1
 entries:
   confluence-server:
   - apiVersion: v2
+    appVersion: 7.9.1
+    created: "2020-12-02T11:48:34.651971892Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Wiki collaboration platform
+    digest: d62ec9aab58065a2ad81f457f30d3a83bfef0cf0d03d1d76d58e2bf0eae09955
+    home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+    icon: https://mox.sh/assets/images/confluence-logo.png
+    keywords:
+    - wiki
+    - confluence
+    - confluence-server
+    - atlassian
+    - documentation
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: confluence-server
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/confluence-server
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/confluence-server-2.0.3/confluence-server-2.0.3.tgz
+    version: 2.0.3
+  - apiVersion: v2
     appVersion: 7.9.0
     created: "2020-11-10T08:02:41.016510718Z"
     dependencies:
@@ -894,6 +927,39 @@ entries:
     version: 0.1.1
   crowd:
   - apiVersion: v2
+    appVersion: 4.2.2
+    created: "2020-12-02T11:48:34.87522209Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Centralized identity management
+    digest: 1ed450d043a04452234ceea2c84d10a3c028e169f125053579e54ebdff2d8055
+    home: https://confluence.atlassian.com/crowd
+    icon: https://mox.sh/assets/images/crowd-logo.png
+    keywords:
+    - identities
+    - directory
+    - single sign-on
+    - crowd
+    - atlassian
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: crowd
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/crowd
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/crowd-2.0.3/crowd-2.0.3.tgz
+    version: 2.0.3
+  - apiVersion: v2
     appVersion: 4.2.1
     created: "2020-11-04T08:02:31.148141277Z"
     dependencies:
@@ -1191,6 +1257,39 @@ entries:
     - https://github.com/javimox/helm-charts/releases/download/crowd-0.1.0/crowd-0.1.0.tgz
     version: 0.1.0
   jira-software:
+  - apiVersion: v2
+    appVersion: 8.14.0
+    created: "2020-12-02T11:48:35.116272737Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: "9.1"
+    description: Issue tracker and agile project management platform
+    digest: 41e8ce816c0745930340a6e770bb8a8e587a2dc30953517fd59eb4782c4d70d9
+    home: https://hub.docker.com/r/atlassian/jira-software
+    icon: https://mox.sh/assets/images/jira-logo.png
+    keywords:
+    - jira
+    - agile
+    - project management
+    - issue tracking
+    - bug tracking
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: jira-software
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/jira-software
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/jira-software-2.0.2/jira-software-2.0.2.tgz
+    version: 2.0.2
   - apiVersion: v2
     appVersion: 8.13.1
     created: "2020-11-04T08:02:31.414099591Z"
