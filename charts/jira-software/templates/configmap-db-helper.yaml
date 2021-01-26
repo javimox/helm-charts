@@ -13,4 +13,9 @@ data:
     CREATE USER {{ .Values.databaseConnection.user }} WITH ENCRYPTED PASSWORD '{{ .Values.databaseConnection.password }}';
     CREATE DATABASE {{ .Values.databaseConnection.database }} WITH OWNER {{ .Values.databaseConnection.user }}
       ENCODING 'UTF8' LC_COLLATE='{{ .Values.databaseConnection.lang }}' LC_CTYPE='{{ .Values.databaseConnection.lang }}' TEMPLATE template0;
+    {{- if ne .Values.databaseConnection.schemaName "public" }}
+    \c {{ .Values.databaseConnection.database }}
+    CREATE SCHEMA IF NOT EXISTS {{ .Values.databaseConnection.schemaName }} AUTHORIZATION {{ .Values.databaseConnection.user }};
+    ALTER DATABASE {{ .Values.databaseConnection.database }} SET search_path TO {{ .Values.databaseConnection.schemaName }},public; 
+    {{- end }}
 {{- end }}
