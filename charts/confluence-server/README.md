@@ -163,6 +163,7 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 | `databaseConnection.lang`                | Encoding used for lc_ctype and lc_collate in case the database needs to be created       | `C`                          |
 | `databaseConnection.port`                | Confluence database server port                                                          | `5432`                       |
 | `databaseConnection.type`                | Confluence database server type                                                          | `postgresql`                 |
+| `databaseConnection.protocol`            | Confluence database JDBC connection protocol                                             | `nil`                        |
 | `databaseDrop.enabled`                   | Enable database removal. See [remove existing database](#remove-existing-database)       | `false`                      |
 | `databaseDrop.dropIt`                    | Confirm database removal if set to `yes`                                                 | `no`                         |
 
