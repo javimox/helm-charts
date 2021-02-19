@@ -275,6 +275,9 @@ databaseConnection:
   ## Database Type
   type: postgresql
 
+  ## Override protocol in JDBC URL
+  #protocol: jdbc:postgresql
+
 ## DB DROP, use with caution!
 ## If postgresql.enabled is set to true and database exists, it will drop the db before creating a new one
 ## (see db-helper ConfigMap)

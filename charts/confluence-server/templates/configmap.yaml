@@ -8,7 +8,11 @@ data:
   {{- range $key, $val := .Values.envVars }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}
+  {{- if .Values.databaseConnection.protocol }}
+  ATL_JDBC_URL: "{{ .Values.databaseConnection.protocol }}://{{ .Values.databaseConnection.host }}:{{ .Values.databaseConnection.port }}/{{ .Values.databaseConnection.database }}"
+  {{- else }}
   ATL_JDBC_URL: "jdbc:{{ .Values.databaseConnection.type }}://{{ .Values.databaseConnection.host }}:{{ .Values.databaseConnection.port }}/{{ .Values.databaseConnection.database }}"
+  {{- end }}
   ATL_JDBC_USER: "{{ .Values.databaseConnection.user }}"
   ATL_DB_TYPE: "{{ .Values.databaseConnection.type }}"
   {{- if .Values.ingress.enabled }}
