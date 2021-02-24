@@ -275,6 +275,9 @@ databaseConnection:
   ## Database Type
   type: postgresql
 
+  ## Database JDBC URL (optional: override for types other than postgresql)
+  # jdbcUrl: jdbc:sqlserver://sql.server.host:1234;database=mydb;user=myuser;password=mypassword
+
 ## DB DROP, use with caution!
 ## If postgresql.enabled is set to true and database exists, it will drop the db before creating a new one
 ## (see db-helper ConfigMap)
