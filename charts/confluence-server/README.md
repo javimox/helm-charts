@@ -178,6 +178,7 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 | `tolerations`                        | List of node taints to tolerate                                                           | `[]`                          |
 | `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                          |
 | `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                          |
+| `podLabels`                          | Map of labels to add to the pods                                                          | `{}`                          |
 | `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                          |
 | `extraVolumes`                       | Additional volumes to add to the pods                                                     | `[]`                          |
 | `schedulerName`                      | Use an alternate scheduler, eg. `stork`                                                   | `""`                          |
