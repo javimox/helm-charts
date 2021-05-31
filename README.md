@@ -19,7 +19,6 @@ $ helm install my-release mox/<chart>
 
 Helm Charts of `mox` repository are available on:
  * [helm.mox.sh](https://helm.mox.sh)
- * [hub.helm.sh](https://hub.helm.sh/charts/mox)
  * [artifacthub.io](https://artifacthub.io/packages/search?repo=mox)
  * [hub.kubeapps.com](https://hub.kubeapps.com/charts/mox)
 
