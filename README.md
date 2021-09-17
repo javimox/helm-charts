@@ -49,7 +49,7 @@ If you want to add your Charts to the **mox** repository or modify those that ar
 * [@helm/chart-releaser-action](https://github.com/helm/chart-releaser-action)
 
 # License
-Copyright © 2020 mox.sh
+Copyright © 2021 mox.sh
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
