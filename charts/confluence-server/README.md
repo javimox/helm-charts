@@ -177,6 +177,7 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 | `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                          |
 | `tolerations`                        | List of node taints to tolerate                                                           | `[]`                          |
 | `affinity`                           | Map of node/pod affinity labels                                                           | `{}`                          |
+| `priorityClassName`                  | Pod priority class name                                                                   | `nil`                         |
 | `podAnnotations`                     | Map of annotations to add to the pods                                                     | `{}`                          |
 | `podLabels`                          | Map of labels to add to the pods                                                          | `{}`                          |
 | `extraVolumeMounts`                  | Additional volume mounts to add to the pods                                               | `[]`                          |
