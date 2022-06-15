@@ -173,6 +173,7 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 |--------------------------------------|-------------------------------------------------------------------------------------------|-------------------------------|
 | `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                           |
 | `securityContext`                    | Container security context options                                                        | `{}`                          |
+| `hostAliases`                        | Host aliases that are added to the pods                                                   | `[]`                          |
 | `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m`    |
 | `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                          |
 | `tolerations`                        | List of node taints to tolerate                                                           | `[]`                          |
