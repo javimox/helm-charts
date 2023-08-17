@@ -32,7 +32,9 @@ jobs:
 
     - name: Create PR
       id: cpr
-      uses: moxbot/create-pull-request@v3
+      uses: moxbot/create-pull-request@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         token: ${{ secrets.WWW_PAT }}
         path: "website/"
