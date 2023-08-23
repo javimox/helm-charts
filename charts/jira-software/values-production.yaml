@@ -55,6 +55,13 @@ securityContext: {}
 #  runAsNonRoot: true
 #  runAsUser: 1000
 
+# Mapping between IP and hostnames that will be injected as entries in the pod's hosts files
+## ref: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
+hostAliases: []
+  # - ip: 10.20.30.40
+  #   hostnames:
+  #   - git.myhostname
+
 ## Service/Networking
 ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
 ## Kubernetes svc configuration

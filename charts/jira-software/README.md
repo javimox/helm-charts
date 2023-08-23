@@ -175,6 +175,7 @@ By default a PostgreSQL will be deployed and a user and a database will be creat
 |--------------------------------------|-------------------------------------------------------------------------------------------|-------------------------------|
 | `replicaCount`                       | Number of replicas for this deployment                                                    | `1`                           |
 | `securityContext`                    | Container security context options                                                        | `{}`                          |
+| `hostAliases`                        | Host aliases that are added to the pods                                                   | `[]`                          |
 | `resources`                          | CPU/Memory resource requests/limits                                                       | Memory: `1Gi`, CPU: `500m`    |
 | `nodeSelector`                       | Node labels for pod assignment                                                            | `{}`                          |
 | `tolerations`                        | List of node taints to tolerate                                                           | `[]`                          |
@@ -347,7 +348,8 @@ If `databaseDrop.enabled` is set to `true` and `databaseDrop.dropIt` is set to `
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 2.4.9
+Chart Version 2.7.0
+
 ```diff
 --- jira-software/values.yaml
 +++ jira-software/values-production.yaml
