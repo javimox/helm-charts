@@ -1192,6 +1192,39 @@ entries:
   crowd:
   - apiVersion: v2
     appVersion: 5.1.4
+    created: "2023-08-23T18:31:59.053629327Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - postgres
+      version: 12.x.x
+    description: Centralized identity management
+    digest: bf0ba9ce73750ccd6e5d603fe6a2802898fcc3d84f9aa232179f3ff5a0a5b9d0
+    home: https://confluence.atlassian.com/crowd
+    icon: https://mox.sh/assets/images/crowd-logo.png
+    keywords:
+    - identities
+    - directory
+    - single sign-on
+    - crowd
+    - atlassian
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: crowd
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/crowd
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/crowd-2.3.0/crowd-2.3.0.tgz
+    version: 2.3.0
+  - apiVersion: v2
+    appVersion: 5.1.4
     created: "2023-08-17T16:42:46.395261889Z"
     dependencies:
     - condition: postgresql.enabled
