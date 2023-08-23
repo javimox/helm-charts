@@ -8,18 +8,18 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 2.0.9
+version: 2.3.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 5.0.0
+appVersion: 5.1.4
 
 icon: https://mox.sh/assets/images/crowd-logo.png
 
 dependencies:
   - name: postgresql
-    version: 9.1
-    repository: https://charts.bitnami.com/bitnami
+    version: 12.x.x
+    repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
     tags:
       - postgres

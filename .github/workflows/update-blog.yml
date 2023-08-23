@@ -13,11 +13,11 @@ jobs:
     steps:
     # this helm repository
     - name: Checkout helm repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     # website
     - name: Checkout website repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: javimox/javimox.github.io
         path: website
@@ -32,9 +32,9 @@ jobs:
 
     - name: Create PR
       id: cpr
-      uses: moxbot/create-pull-request@v3
+      uses: peter-evans/create-pull-request@v5
       with:
-        token: ${{ secrets.WWW_PAT }}
+        token: ${{ secrets.PAT_ACCESS }}
         path: "website/"
         commit-message: "[Release] New chart version: ${{ env.TAG }}"
         committer: moxbot <bot@mox.sh>

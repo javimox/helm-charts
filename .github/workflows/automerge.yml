@@ -9,7 +9,7 @@ jobs:
       - name: automerge
         uses: "moxbot/automerge-action@4536e8847eb62fe2f0ee52c8fa92d17aa97f932f"
         env:
-          GITHUB_TOKEN: "${{ secrets.CR_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.PAT_ACCESS }}
           MERGE_FILTER_AUTHOR: "moxbot"
           MERGE_LABELS: "update-appVersion"
           MERGE_COMMIT_MESSAGE: "[Release] Updated to latest stable Apps versions"
