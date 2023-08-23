@@ -1820,6 +1820,39 @@ entries:
   jira-software:
   - apiVersion: v2
     appVersion: 9.4.9
+    created: "2023-08-23T21:57:24.567468861Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: 12.x.x
+    description: Issue tracker and agile project management platform
+    digest: 2d23db265d22807bc85519e95855381614d2772bf1df7aab887b11b2912352cd
+    home: https://hub.docker.com/r/atlassian/jira-software
+    icon: https://mox.sh/assets/images/jira-logo.png
+    keywords:
+    - jira
+    - agile
+    - project management
+    - issue tracking
+    - bug tracking
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: jira-software
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/jira-software
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/jira-software-2.7.0/jira-software-2.7.0.tgz
+    version: 2.7.0
+  - apiVersion: v2
+    appVersion: 9.4.9
     created: "2023-08-17T22:30:45.922472011Z"
     dependencies:
     - condition: postgresql.enabled
