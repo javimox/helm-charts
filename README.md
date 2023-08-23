@@ -1,4 +1,4 @@
-[![](https://github.com/javimox/helm-charts/workflows/Release%20Charts/badge.svg?branch=master)](https://github.com/javimox/helm-charts/actions) ![Latest Stable Versions](https://github.com/javimox/helm-charts/workflows/Latest%20Stable%20Versions/badge.svg) [![Downloads](https://img.shields.io/github/downloads/javimox/helm-charts/total?color=blue&label=Downloads&style=plastic)](https://github.com/javimox/helm-charts/releases/)
+![Lint and Test Charts](https://github.com/javimox/helm-charts/workflows/Lint%20and%20Test%20Charts/badge.svg) [![](https://github.com/javimox/helm-charts/workflows/Release%20Charts/badge.svg?branch=master)](https://github.com/javimox/helm-charts/actions) ![Latest Stable Versions](https://github.com/javimox/helm-charts/workflows/Latest%20Stable%20Versions/badge.svg) [![Downloads](https://img.shields.io/github/downloads/javimox/helm-charts/total?color=blue&label=Downloads&style=plastic)](https://github.com/javimox/helm-charts/releases/)
 
 # mox helm repository
 
