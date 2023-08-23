@@ -62,7 +62,7 @@ jobs:
       id: cpr
       uses: moxbot/create-pull-request@v3
       with:
-        token: ${{ secrets.CR_TOKEN }}
+        token: ${{ secrets.PAT_ACCESS }}
         commit-message: "[Release] update Charts with the latest stable App versions"
         committer: moxbot <bot@mox.sh>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
