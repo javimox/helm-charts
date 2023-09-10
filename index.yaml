@@ -2,6 +2,39 @@ apiVersion: v1
 entries:
   confluence-server:
   - apiVersion: v2
+    appVersion: 8.5.1
+    created: "2023-09-10T06:52:52.915159075Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: 12.x.x
+    description: Wiki collaboration platform
+    digest: 1f12a69df019587708395bf4e26506f6b5b5b53dab3cdbb228f58f42caa2ddfc
+    home: https://confluence.atlassian.com/doc/confluence-server-documentation-135922.html
+    icon: https://mox.sh/assets/images/confluence-logo.png
+    keywords:
+    - wiki
+    - confluence
+    - confluence-server
+    - atlassian
+    - documentation
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: confluence-server
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/confluence-server
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/confluence-server-3.7.1/confluence-server-3.7.1.tgz
+    version: 3.7.1
+  - apiVersion: v2
     appVersion: 8.5.0
     created: "2023-08-23T19:24:19.98295111Z"
     dependencies:
@@ -1223,6 +1256,39 @@ entries:
     - https://github.com/javimox/helm-charts/releases/download/confluence-server-0.1.1/confluence-server-0.1.1.tgz
     version: 0.1.1
   crowd:
+  - apiVersion: v2
+    appVersion: 5.1.5
+    created: "2023-09-10T06:52:53.011107693Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: 12.x.x
+    description: Centralized identity management
+    digest: 11bb061ec89aecd5f818059f288620de56c55534d527127a73bb044a1c0a324f
+    home: https://confluence.atlassian.com/crowd
+    icon: https://mox.sh/assets/images/crowd-logo.png
+    keywords:
+    - identities
+    - directory
+    - single sign-on
+    - crowd
+    - atlassian
+    - application
+    maintainers:
+    - email: jmox@pm.me
+      name: jmox
+    name: crowd
+    sources:
+    - https://helm.sh
+    - https://helm.mox.sh
+    - https://hub.docker.com/r/atlassian/crowd
+    type: application
+    urls:
+    - https://github.com/javimox/helm-charts/releases/download/crowd-2.4.1/crowd-2.4.1.tgz
+    version: 2.4.1
   - apiVersion: v2
     appVersion: 5.1.4
     created: "2023-08-23T22:08:41.021900499Z"
