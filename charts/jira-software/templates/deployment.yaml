@@ -30,6 +30,10 @@ spec:
             "sh",
             "-c",
             "until pg_isready -h {{ .Values.postgresql.fullnameOverride }} -p 5432 ; do echo waiting for {{ .Values.postgresql.fullnameOverride }}; sleep 5; done;"]
+          {{- with .Values.postgresql.initdbResources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- end }}
         {{- if .Values.caCerts }}
         - name: ca-certs
@@ -53,6 +57,10 @@ spec:
           {{- with .Values.caCertsEnv }}
           env:
             {{- . | toYaml | trim | nindent 12 }}
+          {{- end }}
+          {{- with .Values.caCerts.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- end }}
       {{- end }}

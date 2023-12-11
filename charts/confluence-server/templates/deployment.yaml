@@ -33,6 +33,8 @@ spec:
             "sh",
             "-c",
             "until pg_isready -h {{ .Values.postgresql.fullnameOverride }} -p 5432 ; do echo waiting for {{ .Values.postgresql.fullnameOverride }}; sleep 5; done;"]
+          resources:
+            {{- toYaml .Values.postgresql.initdbResources | nindent 12 }}
         {{- end }}
         {{- if .Values.caCerts }}
         - name: ca-certs
@@ -53,6 +55,8 @@ spec:
               name: {{ include "confluence-server.pvcHome" . }}
             - mountPath: /var/atlassian/application-data/confluence/secrets/cas
               name: confluence-cas
+          resources:
+            {{- toYaml .Values.caCerts.resources | nindent 12 }}
           {{- with .Values.caCertsEnv }}
           env:
             {{- . | toYaml | trim | nindent 12 }}

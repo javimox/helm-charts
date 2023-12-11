@@ -254,6 +254,9 @@ postgresql:
   initdbScriptsConfigMap: |-
     {{ .Release.Name }}-db-helper-cm
 
+  ## InitDB container resources
+  initdbResources: {}
+
   ## Use existing secret to set the password for 'databaseConnection.user' in postgres
   ## https://github.com/javimox/helm-charts/tree/master/charts/confluence-server#use-existing-secrets
   ## https://github.com/bitnami/charts/tree/master/bitnami/postgresql#initialize-a-fresh-instance
@@ -310,6 +313,7 @@ databaseDrop:
 caCerts: {}
   # secret: my-secret
   # storepass: my-store-password
+  # resources: {}
 # caCertsEnv:
 #   - name: VARIABLE
 #     value: my-value
