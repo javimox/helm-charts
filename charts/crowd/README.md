@@ -349,7 +349,7 @@ $ helm upgrade --install my-release \
 
 ## <a name="values_values-prod-diff"></a>Difference between values and values-production
 
-Chart Version 2.4.2
+Chart Version 2.4.3
 ```diff
 --- crowd/values.yaml
 +++ crowd/values-production.yaml
